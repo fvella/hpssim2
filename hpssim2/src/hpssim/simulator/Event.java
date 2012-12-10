@@ -16,9 +16,16 @@ public class Event {
         type = _type;
         time = _time;
     }
-    public Job job;
+    public Event(Job _job, int _type, int _time, int _indexQueue) {
+    	job = _job;
+        type = _type;
+        time = _time;
+        indexQueue = _indexQueue;
+	}
+	public Job job;
     public int time;
     public int type;
+    public int indexQueue;
     public static final int ENQUEUE = 0;
     public static final int RUN = 1;
     public static final int REQUEUE = 2;

@@ -48,8 +48,8 @@ public class EventWorkFlow {
 	 * Other methods such as recalculate priority of all job
 	 */
 	public static void enqueue(SchedulingPolicy scheduler,EventList evl, Event ev, Hardware hw) {
-		scheduler.enqueue(ev.job, ev.time);
-		Event ev1 = new Event(null, Event.RUN, ev.time);
+		int index = scheduler.enqueue(ev.job, ev.time);
+		Event ev1 = new Event(ev.job, Event.RUN, ev.time, index);
 		evl.insertEvent(ev1);
 		System.out.print("RUN " + ev.time + " " + hw.getCPUfree() + " "
 				+ hw.getGPUfree() + " " + scheduler.size() + " ");
@@ -63,7 +63,7 @@ public class EventWorkFlow {
 	 * hpssim.DeviceList, hpssim.Queue)
 	 */
 	public static void run(SchedulingPolicy scheduler, EventList evl, Event ev, Hardware hw) throws Exception{
-		scheduler.execute(hw, ev.time, evl);
+		scheduler.execute(ev, hw, ev.time, evl);
 	}
 
 	/*

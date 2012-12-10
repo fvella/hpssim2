@@ -7,6 +7,7 @@ import hpssim.scheduler.policy.queue.HighestPriorityFirst;
 import hpssim.scheduler.policy.queue.IQueue;
 import hpssim.scheduler.policy.queue.HPSSimQueue;
 import hpssim.scheduler.policy.queue.RandomQueue;
+import hpssim.scheduler.policy.scheduling.CompletelyFairScheduler;
 import hpssim.scheduler.policy.scheduling.IScheduler;
 import hpssim.scheduler.policy.scheduling.SchedulingPolicy;
 import hpssim.scheduler.policy.scheduling.HPSSimScheduler;
@@ -40,7 +41,8 @@ public class Simulator implements Runnable {
 			double _classificationRate, double _realTimeJobsProb,
 			double _hjobrate, int _avgta) {
 		
-		scheduler = new HPSSimScheduler();
+//		scheduler = new HPSSimScheduler();
+		scheduler = new CompletelyFairScheduler(_hw);
 		
 		Simulator.tq = _quantum;
 		this.njobs = _njobs;

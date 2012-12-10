@@ -17,7 +17,7 @@ public class HPSSimScheduler implements SchedulingPolicy {
 	}
 
 	@Override
-	public void execute(Hardware hw, int timeEv, EventList evl)
+	public void execute(Event ev,Hardware hw, int timeEv, EventList evl)
 			throws Exception {
 		// System.out.println("RUN");
 
@@ -88,8 +88,9 @@ public class HPSSimScheduler implements SchedulingPolicy {
 	}
 
 	@Override
-	public void enqueue(Job job, int time) {
+	public int enqueue(Job job, int time) {
 		queue.insert(job);
+		return 0;
 	}
 
 	@Override

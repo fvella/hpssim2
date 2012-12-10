@@ -6,7 +6,7 @@ import java.io.Serializable;
 
 
 public interface IScheduler {
-	public abstract void enqueue(Job job, int time);
+	public abstract int enqueue(Job job, int time);
 
 	public abstract Job extract();
 

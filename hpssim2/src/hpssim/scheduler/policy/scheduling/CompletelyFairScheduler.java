@@ -1,18 +1,21 @@
 package hpssim.scheduler.policy.scheduling;
 
+import java.lang.reflect.Array;
+
 import hpssim.hardware.Hardware;
-import hpssim.scheduler.policy.queue.IQueue;
 import hpssim.scheduler.policy.queue.RedBlackTree;
+import hpssim.simulator.Event;
 import hpssim.simulator.EventList;
 import hpssim.simulator.Job;
 
 public class CompletelyFairScheduler implements SchedulingPolicy {
 	// QUEUE CFS
-	private IQueue cfs_rq;
-	
-	private IQueue[] cpu_rq;
-	private IQueue[] gpu_rq;
-	
+	private RedBlackTree cfs_rq;
+	private int cfs_rq_index = 0;
+
+	private RedBlackTree[] cpu_rq;
+	private RedBlackTree[] gpu_rq;
+
 	/**
 	 * 
 	 * Completely Fair Scheduler calculates time slice based on the number of
@@ -51,12 +54,12 @@ public class CompletelyFairScheduler implements SchedulingPolicy {
 	public static int prio_to_weight[] = {
 	/* -20 */88761, 71755, 56483, 46273, 36291,
 	/* -15 */29154, 23254, 18705, 14949, 11916,
-	/* -10 */9548,  7620, 6100, 4904, 3906,
-	/* -5  */3121,  2501, 1991, 1586, 1277,
-	/*  0  */1024,  820, 655, 526, 423,
-	/*  5  */335,   272, 215, 172, 137,
-	/*  10 */110,   87, 70, 56, 45,
-	/*  15 */36,    29, 23, 18, 15, };
+	/* -10 */9548, 7620, 6100, 4904, 3906,
+	/* -5 */3121, 2501, 1991, 1586, 1277,
+	/* 0 */1024, 820, 655, 526, 423,
+	/* 5 */335, 272, 215, 172, 137,
+	/* 10 */110, 87, 70, 56, 45,
+	/* 15 */36, 29, 23, 18, 15, };
 
 	public static int NICE_0_LOAD = prio_to_weight[20];
 
@@ -88,17 +91,25 @@ public class CompletelyFairScheduler implements SchedulingPolicy {
 	public long sched_nr_latency = 5L;
 
 	public CompletelyFairScheduler(Hardware hw) {
-		
+
 		int ncpu = hw.numcpus() + hw.numgpus();
-		
+
 		sysctl_sched_latency = 20 * (1 + ncpu);
 		sysctl_sched_min_granularity = 4 * (1 + ncpu);
 		sched_nr_latency = sysctl_sched_latency / sysctl_sched_min_granularity;
-		
+
 		cpu_rq = new RedBlackTree[hw.numcpus()];
 		gpu_rq = new RedBlackTree[hw.numgpus()];
-		
-		//default cfs_rq contents current queue
+
+		for (int i = 0; i < cpu_rq.length; i++) {
+			cpu_rq[i] = new RedBlackTree();
+		}
+
+		for (int i = 0; i < gpu_rq.length; i++) {
+			gpu_rq[i] = new RedBlackTree();
+		}
+
+		// default cfs_rq contents current queue
 		cfs_rq = cpu_rq[0];
 	}
 
@@ -106,7 +117,9 @@ public class CompletelyFairScheduler implements SchedulingPolicy {
 		long lenght_of_period = __sched_period(cfs_rq.size());
 		long weight = j.getWeight();
 
-		return (lenght_of_period * weight) / (1/*cfs_rq.renqueue_weight*/);
+		long timeSlice = (lenght_of_period * weight) / (cfs_rq.renqueue_weight);
+
+		return timeSlice == 0 ? 1 : timeSlice;
 	}
 
 	/**
@@ -163,17 +176,17 @@ public class CompletelyFairScheduler implements SchedulingPolicy {
 	 * not in our scheduling class.
 	 */
 	/**
-	 * Get the amount of time the current task was running since the last
-	 * time we changed load
+	 * Get the amount of time the current task was running since the last time
+	 * we changed load
 	 */
-	private void update_curr(Job curr, Integer now) { //now = timeEvent
+	private void update_curr(Job curr, Integer now) { // now = timeEvent
 		Integer delta_exec = now - curr.getLastExecutionTime();
 
 		__update_curr(curr, delta_exec);
 
 		curr.setLastExecutionTime(now);
 	}
-	
+
 	private void __update_curr(Job curr, Integer delta_exec) {
 
 		Integer delta_exec_weighted = 0;
@@ -195,7 +208,7 @@ public class CompletelyFairScheduler implements SchedulingPolicy {
 	 * delta /= w
 	 */
 	private Integer calc_delta_fair(Integer delta_exec, Job se) {
-		if (!(se.getWeight() != NICE_0_LOAD))
+		if ((se.getWeight() != NICE_0_LOAD))
 			delta_exec = calc_delta_mine(delta_exec, se.getWeight());
 
 		return delta_exec;
@@ -212,7 +225,7 @@ public class CompletelyFairScheduler implements SchedulingPolicy {
 	private Integer calc_delta_mine(Integer delta_exec, Integer weight) {
 		return delta_exec * (NICE_0_LOAD / weight);
 	}
-	
+
 	/*
 	 * kernel/sched_fair.c row 406
 	 * 
@@ -233,37 +246,243 @@ public class CompletelyFairScheduler implements SchedulingPolicy {
 		}
 		return period;
 	}
-	
+
 	// SCHEDULER
 	@Override
-	public void execute(Hardware hw, int timeEv, EventList evl) {
-		// TODO Auto-generated method stub
+	public void execute(Event ev, Hardware hw, int timeEv, EventList evl) {
+
+		int nextime = timeEv + (int) sysctl_sched_latency;
+
+		if (ev.job == null) {
+			// si tratta di un evento run chiamato dallo scheduler
+
+			// GPU
+			if (hw.getCPUfree() > 0) {
+				// per eseguire un processo sulla gpu
+				// c'è bisogno di almeno una gpu
+				for (int i = 0; i < gpu_rq.length; i++) {
+					// scorro la lista delle gpu
+					cfs_rq = gpu_rq[i];
+					// chiamo il metodo che esegue il job
+					if (cfs_rq.size() > 0)
+						executeJob(hw, timeEv++, evl, true,
+								hw.getGPUfree() > 0, i);
+				}
+			}
+
+			// CPU
+			for (int i = 0; i < cpu_rq.length; i++) {
+				// scorro la lista delle cpu
+				cfs_rq = cpu_rq[i];
+				if (cfs_rq.size() > 0)
+					executeJob(hw, timeEv++, evl, false, hw.getCPUfree() > 0, i);
+			}
+		} else {
+			// si tratta di un evento run chiamato dall'esecuzione di un job
+			if (ev.job.classification == 0) {
+				cfs_rq = cpu_rq[ev.indexQueue];
+
+				if (cfs_rq.getCurr() == null) {
+					executeJob(hw, timeEv++, evl, false, false, ev.indexQueue);
+				} else
+					executeJob(hw, timeEv++, evl, false, true, ev.indexQueue);
+			} else {
+				cfs_rq = cpu_rq[ev.indexQueue];
+
+				if (cfs_rq.getCurr() == null) {
+					executeJob(hw, timeEv++, evl, true, false, ev.indexQueue);
+				} else
+					executeJob(hw, timeEv++, evl, true, true, ev.indexQueue);
+			}
+		}
+		//
+		// if ((j.remainingTime > Simulator.tq) && (!gpurun)) {
+		// // REQUEUE //SETTA LA NUOVA PRIORITA' //SETTA IL TEMPO
+		// // RIMANENTE
+		// // j.rescheduled++;
+		// evl.insertEvent(new Event(j, Event.REQUEUE, timeEv
+		// + Simulator.tq));
+		// System.out.print("REQUEUE " + (timeEv + Simulator.tq) + " "
+		// + hw.getCPUfree() + " " + hw.getGPUfree() + " "
+		// + queue.size() + " ");
+		// // evl.insertEvent(ev1);
+		// } else { // FINALIZE
+		//
+		// }
+	}
+
+	private void updateJob(Job j, int timeEv, boolean gpurun) {
+		if (j.rescheduled == 0) {
+			// if first execution set start run
+			// time, remaning time
+			j.setExecutionTime(timeEv);
+			j.setQueueTime(timeEv);
+
+			if (gpurun) {
+				j.setRemainingTime(j.executionTimeGPU);
+			} else {
+				j.setRemainingTime(j.executionTimeCPU);
+			}
+		} else {
+			// non è la prima esecuzione
+			j.setRemainingTime(j.getRemainingTime() - (int) getTimeSlice(j));
+		}
+	}
+
+	private void executeJob(Hardware hw, int timeEv, EventList evl,
+			boolean gpu, boolean devicefree, int indexQueue) {
+		int nextime = timeEv + (int) sysctl_sched_latency;
+		Job j = null;
+
+		if (devicefree) {
+			// nel caso ci sono gpu\cpu libere
+			// eseguo il primo della lista
+			j = cfs_rq.extract();
+
+			if (gpu)
+				hw.assignJobtoGPU(j);
+			else
+				hw.assignJobtoCPU(j);
+
+			update_curr(j, timeEv);
+			updateJob(j, timeEv, true);
+
+			int timeslice = (int) getTimeSlice(j);
+			evl.insertEvent(new Event(j, Event.RUN, timeEv + timeslice,
+					indexQueue));
+			System.out.print("RUN " + timeslice + " " + hw.getCPUfree() + " "
+					+ hw.getGPUfree() + " " + size() + " ");
+
+		} else {
+			// va in loop xke devicefree == false
+			// nel caso l'evento arriva da un ENQUEUE
+			// e quindi con job == null
+			// curr == null xke non sono stati eseguiti job nella coda corrente
+			j = cfs_rq.getCurr();
+
+			if (j == null) {
+				evl.insertEvent(new Event(null, Event.RUN, nextime));
+				System.out.print("RUN " + nextime + " " + hw.getCPUfree() + " "
+						+ hw.getGPUfree() + " " + size() + " ");
+				return;
+			}
+
+			// controllare se il curr ha finito
+			// il tempo di esecuzione a lui dato
+			if (j.getRemainingTime() <= 0) {
+				// ha finito la sua esecuzione
+				// deve andare in stato di finalize
+
+				evl.insertEvent(new Event(j, Event.FINALIZE, nextime));
+
+				System.out.print("FINALIZE " + (nextime) + " "
+						+ hw.getCPUfree() + " " + hw.getGPUfree() + " "
+						+ size() + " ");
+
+				cfs_rq.setCurr(null);
+
+				evl.insertEvent(new Event(null, Event.RUN, nextime));
+				System.out.print("RUN " + nextime + " " + hw.getCPUfree() + " "
+						+ hw.getGPUfree() + " " + size() + " ");
+
+			} else {
+				// non ha ancora finito l'esecuzione
+				// se non ci sono job nella coda con priorità maggiore
+				// riesegue lo stesso
+
+				// controllo se il primo della lista ha
+				// vtime minore del curr
+				Job jLookup = cfs_rq.lookup();
+
+				if (jLookup != null
+						&& cfs_rq.getKey(jLookup) < cfs_rq.getKey(j)) {
+					// devo effettuare lo switch tra i processi
+					// e reinserire in coda il processo curr
+					j = jLookup;
+					Job curr = cfs_rq.getCurr();
+
+					evl.insertEvent(new Event(curr, Event.ENQUEUE, nextime));
+
+					System.out.print("REQUEUE " + (nextime) + " "
+							+ hw.getCPUfree() + " " + hw.getGPUfree() + " "
+							+ size() + " ");
+
+					j = cfs_rq.extract();
+
+					if (gpu)
+						hw.assignJobtoGPU(j);
+					else
+						hw.assignJobtoCPU(j);
+
+					update_curr(j, timeEv);
+					updateJob(j, timeEv, true);
+				} else {
+					// rieseguo lo stesso
+
+					update_curr(j, timeEv);
+					updateJob(j, timeEv, true);
+
+					int timeslice = (int) getTimeSlice(j);
+					evl.insertEvent(new Event(j, Event.RUN, timeEv + timeslice,
+							indexQueue));
+					System.out.print("RUN " + timeslice + " " + hw.getCPUfree()
+							+ " " + hw.getGPUfree() + " " + size() + " ");
+				}
+			}
+		}
+
 	}
 
 	@Override
-	public void enqueue(Job se, int time) {
-		 /*
+	public int enqueue(Job se, int time) {
+		int j = loadBalancing(se.classification, true);
+		/*
 		 * Update run-time statistics of the 'current'.
 		 */
-		 update_curr(se, time);
-		
-		 cfs_rq.insert(se);
-//		 renqueue_weight += se.getWeight();
+		update_curr(se, time);
+
+		cfs_rq.insert(se);
+		// renqueue_weight += se.getWeight();
+		return j;
 	}
-	
-	private int loadBalancing(int classification){
-		if(classification==0){
-			for (int i = 0; i < cpu_rq.length; i++) {
-//				cfs_rq[i]
+
+	/**
+	 * return the number of best cpu\gpu queue end set cfs_rq
+	 * 
+	 * */
+	private int loadBalancing(int classification, boolean setcfs) {
+		int j = 0;
+		long w = 0;
+		if (classification == 0) {
+			// CPU
+			w = cpu_rq[0].renqueue_weight;
+			for (int i = 1; i < cpu_rq.length; i++) {
+				if (w > cpu_rq[i].renqueue_weight) {
+					w = cpu_rq[i].renqueue_weight;
+					j = i;
+				}
 			}
+			if (setcfs)
+				cfs_rq = cpu_rq[j];
+		} else {
+			// GPU
+			w = gpu_rq[0].renqueue_weight;
+			for (int i = 1; i < gpu_rq.length; i++) {
+				if (w > gpu_rq[i].renqueue_weight) {
+					w = gpu_rq[i].renqueue_weight;
+					j = i;
+				}
+			}
+			if (setcfs)
+				cfs_rq = gpu_rq[j];
 		}
-		return 0;
+		return j;
 	}
-	
+
 	@Override
 	public Job extract() {
 		Job job = cfs_rq.extract();
-//		renqueue_weight -= job.getWeight();
+		cfs_rq.renqueue_weight -= job.getWeight();
 		return job;
 	}
 

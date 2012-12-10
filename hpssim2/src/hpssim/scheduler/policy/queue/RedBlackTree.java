@@ -117,6 +117,11 @@ public class RedBlackTree implements IQueue{
 		return getCurr();
 	}
 	
+	public Job lookup(){
+		if(requestsQueue.size()>0)
+		return requestsQueue.get(requestsQueue.firstKey());
+		else return null;
+	}
 	
 	/**
 	 * Then the tasks are ordered
@@ -130,14 +135,14 @@ public class RedBlackTree implements IQueue{
 	 * 
 	 * */
 	
-	private int getKey(Job job){
+	public int getKey(Job job){
 		return job.getVruntime() - getMin_Vrtime();
 //		return job.getVruntime();
 //		return (job.getFair_clock() - job.getWait_runtime());
 	}
 	
 	public Integer getMin_Vrtime(){
-		return requestsQueue.firstKey() != null ? requestsQueue.firstKey() : 0;
+		return requestsQueue.size() != 0 ? requestsQueue.firstKey() : 0;
 	}
 
 	public Job getCurr() {

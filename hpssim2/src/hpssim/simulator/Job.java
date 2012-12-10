@@ -21,18 +21,18 @@ public class Job /* implements Comparable<Job> */{
 	public int tfinalize; /**/
 	public int rescheduled;
 	public int type; /* O realttime 1 user */
-	public static int current_id = 0;
-	public int id;
+	public final int id;
 
 	public Integer vruntime; /* valore per CFS */
 	public int nice;
 	public Integer lastExecutionTime;
+	public int queue;
 	
 	/*
 	 * Costructor
 	 */
 	
-	public Job(int ta, int rcpu, int rgpu, int type, int nice, int vruntime) {
+	public Job(int ta, int rcpu, int rgpu, int type, int nice, int vruntime, int current_id) {
 		this.timeArrival = ta;
 		this.executionTimeCPU = rcpu;
 		this.executionTimeGPU = rgpu;
@@ -42,13 +42,13 @@ public class Job /* implements Comparable<Job> */{
 		this.rescheduled = 0;
 		this.processPriority = 0;
 		this.schedulingPriority = 0;
-		this.id = this.current_id++;
+		this.id = current_id;
 		
 		this.nice = nice;
 		this.vruntime = vruntime;
 	}
 	
-	public Job(int ta, int rcpu, int rgpu, int type) {
+	public Job(int ta, int rcpu, int rgpu, int type, int current_id) {
 		this.timeArrival = ta;
 		this.executionTimeCPU = rcpu;
 		this.executionTimeGPU = rgpu;
@@ -58,19 +58,19 @@ public class Job /* implements Comparable<Job> */{
 		this.rescheduled = 0;
 		this.processPriority = 0;
 		this.schedulingPriority = 0;
-		this.id = this.current_id++;
+		this.id = current_id;
 		
 		this.nice = 0;
 		this.vruntime = 0;
 	}
 
-	public Job(int ta) {
+	public Job(int ta, int current_id) {
 		this.timeArrival = ta;
 		this.queueTime = 0;
 		this.executionTime = 0;
 		this.tfinalize = 0;
 		this.rescheduled = 0;
-		this.id = this.current_id++;
+		this.id = current_id;
 		this.processPriority = 0;
 		this.schedulingPriority = 0;
 		
@@ -78,28 +78,47 @@ public class Job /* implements Comparable<Job> */{
 		this.vruntime = 0;
 	}
 
-	public Job() {
-		this.id = this.current_id++;
-		
-		this.nice = 0;
-		this.vruntime = 0;
-	}
+//	public Job(int current_id) {
+//		this.id = current_id;
+//		
+//		this.nice = 0;
+//		this.vruntime = 0;
+//	}
 
 	/*
 	 * Set methods
 	 */
 	public void printJob() {
 		System.out.println("ID " + this.id + " TA " + this.timeArrival + " "
-				+ this.type + " | " + "class " + this.classification
+				+ getType() + " | " + "class " + this.classification
 				+ " CPU and GPU timeservice " + this.getRcpu() + " "
 				+ this.getRgpu());
 	}
 
+//	public void printjobstat() {
+//		System.out.println(
+//				  " id " + this.id  
+//				+ " Nice " + nice 
+//				+ " TimeArrival " + this.timeArrival
+//				+ " Type " + getType() 
+//				+ " Classification " + (classification==0?"CPU":"GPU")
+//				+ " Rescheduled " + this.rescheduled 
+//				+ " QueueTime " + this.getTq()
+//				+ " ExecutionTime " + this.getTe() 
+//				+ " FinalizeTime " + this.getTfinalize());
+//	}
+	
 	public void printjobstat() {
-		System.out.println("id " + this.id + " Ta " + this.timeArrival
-				+ " Type " + this.type + " Class " + this.classification
-				+ " Resch " + this.rescheduled + " Trun " + this.getTq()
-				+ " Te " + this.getTe() + " Fin " + this.getTfinalize());
+		System.out.println(
+				  " id " + this.id  
+				+ " - Nice " + nice 
+				+ " - Ta " + this.timeArrival
+				+ " - Type " + getType() 
+				+ " - Cl " + (classification==0?"CPU":"GPU")
+				+ " - Resch " + this.rescheduled 
+				+ " - Qt " + this.getQueueTime()
+				+ " - Et " + this.getExecutionTime() 
+				+ " - Ft " + this.getTfinalize());
 	}
 	
 	public int getWeight() {
@@ -109,7 +128,13 @@ public class Job /* implements Comparable<Job> */{
 	/*
 	 * Get methods
 	 */
-
+	
+	
+	public String getType(){
+		if(type==0) return "RT";
+		return "US";
+	}
+	
 	public int getTa() {
 		return timeArrival;
 	}
@@ -206,20 +231,12 @@ public class Job /* implements Comparable<Job> */{
 		this.rescheduled = rescheduled;
 	}
 
-	public int getType() {
-		return type;
-	}
-
 	public void setType(int type) {
 		this.type = type;
 	}
 
 	public int getId() {
 		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
 	}
 
 	// public int compareTo(Job o2) {
@@ -307,14 +324,6 @@ public class Job /* implements Comparable<Job> */{
 
 	public void setExecutionTime(int executionTime) {
 		this.executionTime = executionTime;
-	}
-
-	public static int getCurrent_id() {
-		return current_id;
-	}
-
-	public static void setCurrent_id(int current_id) {
-		Job.current_id = current_id;
 	}
 
 	public Integer getVruntime() {

@@ -12,19 +12,18 @@ public class HPSsim {
 
 		long test = System.currentTimeMillis();
 
-		int njobs = 3;
+		int njobs = 50;
 
 		// il tempo cpu che può spendere il processo
 		int qt = 210;
-		double classificationRate = 0.9D;
-		double realTimeJobsProb = 0.4D;
+		double classificationRate = 0.95D;
+		double realTimeJobsProb = 0.45D;
 		double percentOpenCLjob = 0.25D;
 		int avgta = 230;
 
-		Hardware hw = new Hardware(4, 1);
+		Hardware hw = new Hardware(8, 2);
 
-		Simulator sim = new Simulator(hw, njobs, qt, classificationRate,
-				realTimeJobsProb, percentOpenCLjob, avgta);
+		Simulator sim = new Simulator(hw, njobs, qt, classificationRate, realTimeJobsProb, percentOpenCLjob, avgta);
 		sim.init();
 		sim.run();
 

@@ -260,7 +260,11 @@ public class Init {
                 
 //                IScheduler s = new HPSSimScheduler(IScheduler.FIFO);
                 sim.init();
-                sim.simulate();
+                try {
+					sim.simulate();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 				
 			}
 		});

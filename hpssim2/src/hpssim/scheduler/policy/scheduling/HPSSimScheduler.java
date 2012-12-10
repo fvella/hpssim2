@@ -17,8 +17,7 @@ public class HPSSimScheduler implements SchedulingPolicy {
 	}
 
 	@Override
-	public void execute(Event ev,Hardware hw, int timeEv, EventList evl)
-			throws Exception {
+	public void execute(Event ev, Hardware hw, int timeEv, EventList evl) throws Exception {
 		// System.out.println("RUN");
 
 		int indexGPUjob;
@@ -27,8 +26,7 @@ public class HPSSimScheduler implements SchedulingPolicy {
 		if (hw.getCPUfree() == 0) {
 			try {
 				evl.insertEvent(new Event(null, Event.RESCHEDULE, timeEv + 1));
-				System.out.print("RESCHEDULE " + (timeEv + 1) + " "
-						+ queue.size() + " ");
+				System.out.print("RESCHEDULE " + (timeEv + 1) + " " + queue.size() + " ");
 				// evl.insertEvent(ev1);
 			} catch (Exception e) {
 				throw e;
@@ -69,18 +67,12 @@ public class HPSSimScheduler implements SchedulingPolicy {
 					// REQUEUE //SETTA LA NUOVA PRIORITA' //SETTA IL TEMPO
 					// RIMANENTE
 					// j.rescheduled++;
-					evl.insertEvent(new Event(j, Event.REQUEUE, timeEv
-							+ Simulator.tq));
-					System.out.print("REQUEUE " + (timeEv + Simulator.tq) + " "
-							+ hw.getCPUfree() + " " + hw.getGPUfree() + " "
-							+ queue.size() + " ");
+					evl.insertEvent(new Event(j, Event.REQUEUE, timeEv + Simulator.tq));
+					System.out.print("REQUEUE " + (timeEv + Simulator.tq) + " " + hw.getCPUfree() + " " + hw.getGPUfree() + " " + queue.size() + " ");
 					// evl.insertEvent(ev1);
 				} else { // FINALIZE
-					evl.insertEvent(new Event(j, Event.FINALIZE, timeEv
-							+ j.remainingTime));
-					System.out.print("FINALIZE " + (timeEv + j.remainingTime)
-							+ " " + hw.getCPUfree() + " " + hw.getGPUfree()
-							+ " " + queue.size() + " ");
+					evl.insertEvent(new Event(j, Event.FINALIZE, timeEv + j.remainingTime));
+					System.out.print("FINALIZE " + (timeEv + j.remainingTime) + " " + hw.getCPUfree() + " " + hw.getGPUfree() + " " + queue.size() + " ");
 					// evl.insertEvent(ev1);
 				}
 			}
@@ -88,9 +80,10 @@ public class HPSSimScheduler implements SchedulingPolicy {
 	}
 
 	@Override
-	public int enqueue(Job job, int time) {
+	public void enqueue(EventList evl, Job job, int time) {
 		queue.insert(job);
-		return 0;
+		Event ev1 = new Event(job, Event.RUN, time);
+		evl.insertEvent(ev1);
 	}
 
 	@Override
@@ -111,6 +104,23 @@ public class HPSSimScheduler implements SchedulingPolicy {
 	@Override
 	public void newpriority() {
 		queue.newpriority();
+	}
+
+	@Override
+	public void finalize(EventList evl, Event ev, Hardware hw, IQueue result) {
+		Job j;
+		Event ev1;
+		j = hw.teminate(ev.job.id);
+		j.executionTime += j.remainingTime;
+		j.remainingTime = 0;
+		j.setTfinalize(ev.time);
+		// add job to terminated job for stats
+		result.insert(j);
+		ev1 = new Event(null, Event.RESCHEDULE, ev.time + 1);
+		evl.insertEvent(ev1);
+		System.out.print("null " + "n/a" + " " + hw.getCPUfree() + " " + hw.getGPUfree() + " " + size() + " ");
+		System.out.print("Queue | ");
+		printjob();
 	}
 
 }

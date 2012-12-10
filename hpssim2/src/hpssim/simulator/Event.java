@@ -16,16 +16,16 @@ public class Event {
         type = _type;
         time = _time;
     }
-    public Event(Job _job, int _type, int _time, int _indexQueue) {
+    public Event(Job _job, int _type, int _time, int _cfsRunType) {
     	job = _job;
         type = _type;
         time = _time;
-        indexQueue = _indexQueue;
+        cfsRunType = _cfsRunType;
 	}
 	public Job job;
     public int time;
     public int type;
-    public int indexQueue;
+    public int cfsRunType = 0;
     public static final int ENQUEUE = 0;
     public static final int RUN = 1;
     public static final int REQUEUE = 2;

@@ -1,12 +1,12 @@
 package hpssim.scheduler.policy.scheduling;
 
+import hpssim.simulator.EventList;
 import hpssim.simulator.Job;
 
 import java.io.Serializable;
 
 
 public interface IScheduler {
-	public abstract int enqueue(Job job, int time);
 
 	public abstract Job extract();
 
@@ -15,5 +15,7 @@ public interface IScheduler {
 	public abstract int size();
 
 	public abstract void newpriority();
+
+    public abstract	void enqueue(EventList evl, Job job, int time);
 
 }

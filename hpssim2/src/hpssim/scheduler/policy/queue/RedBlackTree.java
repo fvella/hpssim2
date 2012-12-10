@@ -14,29 +14,37 @@ public class RedBlackTree implements IQueue{
 	
 	private Job curr;
 	
-	public long renqueue_weight = 1;
+	public long renqueue_weight = 0;
+	
+	private String nome;
+	
+	@Override
+	public String toString() {
+		return nome;
+	}
 
-	public RedBlackTree() {
+	public RedBlackTree(String string) {
 		requestsQueue = new TreeMap<>();
+		nome = string;
 	}
 
 	@Override
 	public Job getFirstCPUJob() {
-		for (Job job : requestsQueue.values()) {
-			if (job.getClassification() == 0) {
-				return job;
-			}
-		}
+//		for (Job job : requestsQueue.values()) {
+//			if (job.getClassification() == 0) {
+//				return job;
+//			}
+//		}
 		return null;
 	}
 
 	@Override
 	public Job getFirstGPUJob() {
-		for (Job job : requestsQueue.values()) {
-			if (job.getClassification() == 1) {
-				return job;
-			}
-		}
+//		for (Job job : requestsQueue.values()) {
+//			if (job.getClassification() == 1) {
+//				return job;
+//			}
+//		}
 		return null;
 	}
 
@@ -47,7 +55,10 @@ public class RedBlackTree implements IQueue{
 
 	@Override
 	public int size() {
-		return requestsQueue.size();
+//		if(curr!=null)
+//		return requestsQueue.size() + 1;
+//		else 
+			return requestsQueue.size() ;
 	}
 
 	@Override
@@ -61,7 +72,10 @@ public class RedBlackTree implements IQueue{
 	public void printjob() {
 		try {
 			for (Job job : requestsQueue.values()) {
-				System.out.print(job.getId() + " ");
+				System.out.print(" " + job.id + " ");
+			}
+			if(requestsQueue.isEmpty()){
+				System.out.print("EMPITY");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -113,6 +127,9 @@ public class RedBlackTree implements IQueue{
 
 	@Override
 	public Job extract() {
+		if(requestsQueue.isEmpty())
+			return null;
+		
 		setCurr(requestsQueue.remove(requestsQueue.firstKey()));
 		return getCurr();
 	}

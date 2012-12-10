@@ -156,7 +156,7 @@ public class HPSSimQueue implements IQueue {
 	public void printjob() {
 		try {
 			for (int i = 0; i < requestsQueue.size(); i++) {
-				System.out.print(requestsQueue.get(i).getId() + " ");
+				System.out.print(requestsQueue.get(i).id + " ");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

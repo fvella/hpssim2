@@ -3,14 +3,9 @@ package hpssim.simulator;
 import hpssim.hardware.Hardware;
 import hpssim.scheduler.EventWorkFlow;
 import hpssim.scheduler.policy.queue.FIFO;
-import hpssim.scheduler.policy.queue.HighestPriorityFirst;
 import hpssim.scheduler.policy.queue.IQueue;
-import hpssim.scheduler.policy.queue.HPSSimQueue;
-import hpssim.scheduler.policy.queue.RandomQueue;
 import hpssim.scheduler.policy.scheduling.CompletelyFairScheduler;
-import hpssim.scheduler.policy.scheduling.IScheduler;
 import hpssim.scheduler.policy.scheduling.SchedulingPolicy;
-import hpssim.scheduler.policy.scheduling.HPSSimScheduler;
 
 import org.apache.commons.math3.random.RandomDataImpl;
 
@@ -35,15 +30,10 @@ public class Simulator implements Runnable {
 	// private IQueue q = new Queue(1);
 	// public IQueue jobended = new Queue(0);
 
-	public IQueue jobended = new HPSSimQueue(0);
+	public IQueue jobended = new FIFO();
 
-	public Simulator(Hardware _hw, int _njobs, int _quantum,
-			double _classificationRate, double _realTimeJobsProb,
-			double _hjobrate, int _avgta) {
-		
-//		scheduler = new HPSSimScheduler();
-		scheduler = new CompletelyFairScheduler(_hw);
-		
+	public Simulator(Hardware _hw, int _njobs, int _quantum, double _classificationRate, double _realTimeJobsProb, double _hjobrate, int _avgta) {
+
 		Simulator.tq = _quantum;
 		this.njobs = _njobs;
 		this.classificationRate = _classificationRate;
@@ -62,16 +52,16 @@ public class Simulator implements Runnable {
 		System.out.println("Start initialization...");
 
 		// inizializzazione scheduler
-//		scheduler = _scheduler;
-		
-		
+		// scheduler = _scheduler;
+
 		RandomDataImpl randomJob = new RandomDataImpl();
 		// randomJob.reSeed(Simulator.tq);
 		// SOLO I JOB UTENTE POSSONO ESSERE CPUoGPU
 
-		// ??
 		int rtjobs = 0;
 		int ujobs = 0;
+		int cpujobs = 0;
+		int gpujobs = 0;
 
 		// per ogni njob che viene in input..
 		int geninterarrivo = 0;
@@ -79,7 +69,7 @@ public class Simulator implements Runnable {
 			// Create new job
 			/* ta,rcpu,rgpu,type */
 			geninterarrivo += (int) randomJob.nextExponential(this.avgta);
-			Job job = new Job(geninterarrivo);
+			Job job = new Job(geninterarrivo, i);
 
 			/* Random job type */
 			if (randomJob.nextUniform(0, 1) > realTimeJobsProb) {
@@ -89,17 +79,16 @@ public class Simulator implements Runnable {
 				 * uniform to selection gpu job according to gpujobrat to
 				 * implementhere
 				 */
-				job.setRcpu((int) randomJob.nextUniform(tq,
-						time_sim / 100));
+				job.setRcpu((int) randomJob.nextUniform(tq, time_sim / 100));
 				if (randomJob.nextUniform(0, 1) > hjobrate) {
 					/* CPU JOB */
 					/* GPU time is long */
-					job.setRgpu((int) (job.getRcpu() * randomJob.nextUniform(1,300)));
+					job.setRgpu((int) (job.getRcpu() * randomJob.nextUniform(1, 300)));
 
 				} else {
 					/* GPU */
 					/* using avg speedup between 2 e 40x */
-					job.setRgpu((int) (job.getRcpu() / randomJob.nextUniform(2,40)));
+					job.setRgpu((int) (job.getRcpu() / randomJob.nextUniform(2, 40)));
 				}
 
 				if (randomJob.nextUniform(0, 1) > classificationRate) {
@@ -122,45 +111,52 @@ public class Simulator implements Runnable {
 			} else {
 				/* rt job */
 				job.setType(0);
-				job.setRcpu((int) randomJob.nextUniform(tq / 2,	tq * 3));
+				job.setRcpu((int) randomJob.nextUniform(tq / 2, tq * 3));
 				job.setRgpu(-1);
 				job.setClassification(0);
 				rtjobs++;
 			}
 			/*
 			 * Settare priorità di default se RT o user rt 1..99 user 100 ..140
-			 *
-			 *valore di nice  se rt  -20>=nice>0 se user 0>=nice<20 
-			 *	
+			 * 
+			 * valore di nice se rt -20>=nice>0 se user 0>=nice<20
 			 */
-			if (job.getType() == 0) {
-				//REAL TIME
+			if (job.type == 0) {
+				// REAL TIME
 				job.setPp(3);
 				job.setPs(90);
 				job.setNice(randomJob.nextInt(0, 20));
 			} else {
-				//USER
+				// USER
 				job.setPp(1);
 				job.setPs(20);
 				job.setNice(randomJob.nextInt(21, 39));
 			}
 
 			job.printJob();
+			if (job.classification == 0)
+				cpujobs++;
+			else
+				gpujobs++;
 			Event ev = new Event(job, Event.ENQUEUE, job.timeArrival);
 			events.insertEvent(ev);
 		}
 		System.out.println("RT " + rtjobs + " - User " + ujobs);
+		System.out.println("CPU " + cpujobs + " - GPU " + gpujobs);
 		// System.out.println(realTimeJobsProb);
 		hw.infosystem();
 		System.out.println("done");
+
+		// scheduler = new HPSSimScheduler();
+		scheduler = new CompletelyFairScheduler(hw, events);
 	}
 
 	private Event clock() throws Exception {
 		Event ev = null;
 		try {
-			
+
 			ev = events.pop();
-			
+
 			switch (ev.type) {
 			case Event.ENQUEUE:
 				System.out.print("ENQUEUE " + ev.time + " ");
@@ -202,10 +198,10 @@ public class Simulator implements Runnable {
 				/* NOT used */
 				break;
 			}
-			
+
 			System.out.println();
 			System.out.println("----------------------------------------");
-			
+
 			return ev;
 		} catch (Exception e) {
 			throw e;
@@ -219,28 +215,28 @@ public class Simulator implements Runnable {
 
 	@Override
 	public void run() {
-		simulate();
+		try {
+			simulate();
+		} catch (Exception e) {
+			e.printStackTrace();
+			new RuntimeException(e);
+		}
 	}
 
-	public synchronized void simulate() {
+	public synchronized void simulate() throws Exception {
 		System.out.println("Start simulation...");
-		System.out
-				.println("Current Event - Ta - Next Event Generate - Ta - Device Status - Queue Size | Queue");
+		System.out.println("Current Event - Ta - Next Event Generate - Ta - Device Status - Queue Size | Queue");
 		int lastEvTime = 0;
 		int i = 0;
 		synchronized (events) {
 			while (lastEvTime < (time_sim) && (!events.list.isEmpty())) {
-				try {
-				
-					Event ev = clock();
-					lastEvTime = ev.time;
-//					printProgBar((int) (lastEvTime / time_sim * 100));
 
-//     				this.wait(1);
-		
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+				Event ev = clock();
+				lastEvTime = ev.time;
+				// printProgBar((int) (lastEvTime / time_sim * 100));
+
+				// this.wait(1);
+
 				i++;
 			}
 		}

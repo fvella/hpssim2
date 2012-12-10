@@ -61,7 +61,7 @@ public class Device {
 		return j;
 	}
 
-	public int whorun() {
+	public long whorun() {
 		if (this.status == 1)
 			return job.id;
 		else

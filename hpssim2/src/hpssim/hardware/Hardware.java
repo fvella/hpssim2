@@ -136,7 +136,8 @@ public class Hardware {
                 break;
             }            
         }
-       
+//       if(j==null)
+//    	   throw new NullPointerException();
         return j;
     }
     public int numcpus(){

@@ -1,22 +1,20 @@
 package hpssim.scheduler.policy.queue;
 
 import hpssim.simulator.Job;
+
+import java.util.Comparator;
 import java.util.TreeMap;
 
 /**
  * @author Luigi Giorgio Claudio Mancini
  */
 public class RedBlackTree implements IQueue{
-
-	
 	private static final long serialVersionUID = 7019036045460362139L;
+	private final String nome;
+	
 	private TreeMap<Integer, Job> requestsQueue;
-	
 	private Job curr;
-	
 	public long renqueue_weight = 0;
-	
-	private String nome;
 	
 	@Override
 	public String toString() {
@@ -24,7 +22,11 @@ public class RedBlackTree implements IQueue{
 	}
 
 	public RedBlackTree(String string) {
-		requestsQueue = new TreeMap<>();
+		requestsQueue = new TreeMap<>(new Comparator<Integer>() {
+			public int compare(Integer o1, Integer o2) {
+				return (o1.intValue() < o2.intValue() ? -1 : (o1.intValue() == o2.intValue() ? 0 : 1));
+			}
+		});
 		nome = string;
 	}
 

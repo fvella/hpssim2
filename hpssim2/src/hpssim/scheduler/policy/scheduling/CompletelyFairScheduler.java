@@ -7,6 +7,10 @@ import hpssim.simulator.Event;
 import hpssim.simulator.EventList;
 import hpssim.simulator.Job;
 
+/**
+ * 
+ * @author Luigi Giorgio Claudio Mancini
+ */
 public class CompletelyFairScheduler implements SchedulingPolicy {
 
 	private boolean logEnable = false;
@@ -504,7 +508,6 @@ public class CompletelyFairScheduler implements SchedulingPolicy {
 
 	@Override
 	public void printjob() {
-		String s = "";
 		if (logEnable) {
 			for (int i = 0; i < cpu_rq.length; i++) {
 				System.out.print(cpu_rq[i] + "[");
@@ -542,12 +545,6 @@ public class CompletelyFairScheduler implements SchedulingPolicy {
 
 	@Override
 	public void finalize(EventList evl, Event ev, Hardware hw, IQueue result) {
-		// Job j = hw.teminate(ev.job.id);
-		//
-		// j.executionTime += j.remainingTime;
-		// // j.remainingTime = 0;
-		// j.setTfinalize(ev.time);
-
 		// add job to terminated job for stats
 		result.insert(ev.job);
 		if (logEnable)

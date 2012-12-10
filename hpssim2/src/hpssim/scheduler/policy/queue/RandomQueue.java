@@ -8,7 +8,7 @@ import java.util.Random;
 /**
  * This class implements a Random assignment policy.
  * 
- * @author 
+ * @author Luigi Giorgio Claudio Mancini 
  * @version 1.1
  */
 public class RandomQueue extends HPSSimQueue {

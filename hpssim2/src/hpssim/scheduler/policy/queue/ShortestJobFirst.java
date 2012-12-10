@@ -6,6 +6,10 @@ import hpssim.simulator.TimeComparatorJob;
 import java.util.ArrayList;
 import java.util.Collections;
 
+/**
+ * @author Luigi Giorgio Claudio Mancini
+ */
+
 public class ShortestJobFirst extends HPSSimQueue {
 
 	public ShortestJobFirst() {

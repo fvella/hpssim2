@@ -2,6 +2,9 @@ package hpssim.simulator;
 
 import java.util.Comparator;
 
+/**
+ * @author Luigi Giorgio Claudio Mancini
+ */
 public class PriorityComparatorJob implements Comparator<Job> {
 
 	@Override

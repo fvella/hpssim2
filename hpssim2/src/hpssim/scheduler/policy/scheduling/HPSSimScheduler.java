@@ -12,8 +12,12 @@ public class HPSSimScheduler implements SchedulingPolicy {
 
 	private IQueue queue;
 
-	public HPSSimScheduler() {
-		queue = new HPSSimQueue();
+	public HPSSimScheduler(Class<? extends HPSSimQueue> queueType) {
+		try {
+			queue = queueType.newInstance();
+		} catch (InstantiationException | IllegalAccessException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override

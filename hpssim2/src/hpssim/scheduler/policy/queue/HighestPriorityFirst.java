@@ -8,8 +8,7 @@ import java.util.ArrayList;
  * This class implements the Highest Priority First assignment policy. This
  * policy always extracts the request with the highest priority.
  * 
- * @author 
- * @version 1.0
+ * @author Luigi Giorgio Claudio Mancini 
  */
 public class HighestPriorityFirst extends HPSSimQueue {
 

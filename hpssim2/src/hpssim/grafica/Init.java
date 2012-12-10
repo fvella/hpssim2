@@ -19,6 +19,10 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
+/**
+ * 
+ * @author Luigi Giorgio Claudio Mancini
+ */
 public class Init {
 
 	private JFrame frame;

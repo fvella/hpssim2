@@ -7,7 +7,7 @@ import java.util.ArrayList;
 /**
  * This class implements a First In First Out assignment policy.
  * 
- * @author 
+ * @author Luigi Giorgio Claudio Mancini
  */
 public class FIFO extends HPSSimQueue {
 

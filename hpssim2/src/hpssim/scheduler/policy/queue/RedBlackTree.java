@@ -3,12 +3,12 @@ package hpssim.scheduler.policy.queue;
 import hpssim.simulator.Job;
 import java.util.TreeMap;
 
-// Class Definitions
+/**
+ * @author Luigi Giorgio Claudio Mancini
+ */
 public class RedBlackTree implements IQueue{
 
-	/**
-	 * 
-	 */
+	
 	private static final long serialVersionUID = 7019036045460362139L;
 	private TreeMap<Integer, Job> requestsQueue;
 	
@@ -30,21 +30,13 @@ public class RedBlackTree implements IQueue{
 
 	@Override
 	public Job getFirstCPUJob() {
-//		for (Job job : requestsQueue.values()) {
-//			if (job.getClassification() == 0) {
-//				return job;
-//			}
-//		}
+		// not necessary
 		return null;
 	}
 
 	@Override
 	public Job getFirstGPUJob() {
-//		for (Job job : requestsQueue.values()) {
-//			if (job.getClassification() == 1) {
-//				return job;
-//			}
-//		}
+		// not necessary
 		return null;
 	}
 
@@ -55,9 +47,6 @@ public class RedBlackTree implements IQueue{
 
 	@Override
 	public int size() {
-//		if(curr!=null)
-//		return requestsQueue.size() + 1;
-//		else 
 			return requestsQueue.size() ;
 	}
 

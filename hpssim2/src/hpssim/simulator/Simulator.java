@@ -5,6 +5,7 @@ import hpssim.scheduler.EventWorkFlow;
 import hpssim.scheduler.policy.queue.FIFO;
 import hpssim.scheduler.policy.queue.IQueue;
 import hpssim.scheduler.policy.scheduling.CompletelyFairScheduler;
+import hpssim.scheduler.policy.scheduling.HPSSimScheduler;
 import hpssim.scheduler.policy.scheduling.SchedulingPolicy;
 
 import org.apache.commons.math3.random.RandomDataImpl;
@@ -147,7 +148,7 @@ public class Simulator implements Runnable {
 		hw.infosystem();
 		System.out.println("done");
 
-		// scheduler = new HPSSimScheduler();
+//		scheduler = new HPSSimScheduler(FIFO.class);
 		scheduler = new CompletelyFairScheduler(hw, events);
 	}
 

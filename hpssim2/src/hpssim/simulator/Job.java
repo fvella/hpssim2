@@ -89,10 +89,7 @@ public class Job /* implements Comparable<Job> */{
 	 * Set methods
 	 */
 	public void printJob() {
-		System.out.println("ID " + this.id + " TA " + this.timeArrival + " "
-				+ getType() + " | " + "class " + this.classification
-				+ " CPU and GPU timeservice " + this.getRcpu() + " "
-				+ this.getRgpu());
+		System.out.println(toString());
 	}
 
 //	public void printjobstat() {
@@ -120,7 +117,13 @@ public class Job /* implements Comparable<Job> */{
 				+ " - Et " + this.getExecutionTime() 
 				+ " - Ft " + this.getTfinalize());
 	}
-	
+	@Override
+	public String toString() {
+		return "ID " + this.id + " TA " + this.timeArrival + " "
+				+ getType() + " | " + "class " + this.classification
+				+ " CPU and GPU timeservice " + this.getRcpu() + " "
+				+ this.getRgpu();
+	}
 	public int getWeight() {
 		return CompletelyFairScheduler.prio_to_weight[nice];
 	}

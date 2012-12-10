@@ -2,20 +2,22 @@ package hpssim.scheduler.policy.queue;
 
 import hpssim.simulator.Job;
 
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.TreeMap;
 
 /**
  * @author Luigi Giorgio Claudio Mancini
  */
-public class RedBlackTree implements IQueue{
+public class RedBlackTree implements IQueue {
 	private static final long serialVersionUID = 7019036045460362139L;
 	private final String nome;
-	
-	private TreeMap<Integer, Job> requestsQueue;
+
+	private TreeMap<Integer, ArrayList<Job>> requestsQueue;
 	private Job curr;
 	public long renqueue_weight = 0;
-	
+
 	@Override
 	public String toString() {
 		return nome;
@@ -49,23 +51,27 @@ public class RedBlackTree implements IQueue{
 
 	@Override
 	public int size() {
-			return requestsQueue.size() ;
+		return requestsQueue.size();
 	}
 
 	@Override
 	public void printpriority() {
-		for (Job job : requestsQueue.values()) {
-			System.out.print(job.getPriority());
+		for (List<Job> jobQueue : requestsQueue.values()) {
+			for (Job job : jobQueue) {
+				System.out.print(job.getPriority());
+			}
 		}
 	}
 
 	@Override
 	public void printjob() {
 		try {
-			for (Job job : requestsQueue.values()) {
-				System.out.print(" " + job.id + " ");
+			for (List<Job> jobQueue : requestsQueue.values()) {
+				for (Job job : jobQueue) {
+					System.out.print(" " + job.id + " ");
+				}
 			}
-			if(requestsQueue.isEmpty()){
+			if (requestsQueue.isEmpty()) {
 				System.out.print("EMPITY");
 			}
 		} catch (Exception e) {
@@ -75,14 +81,20 @@ public class RedBlackTree implements IQueue{
 
 	@Override
 	public void printJobsStat() {
-		for (Job job : requestsQueue.values()) {
-			job.printjobstat();
+		for (List<Job> jobQueue : requestsQueue.values()) {
+			for (Job job : jobQueue) {
+				job.printjobstat();
+			}
 		}
 	}
 
 	@Override
 	public Job getJob(int key) {
-		return requestsQueue.remove(key);
+		List<Job> f = requestsQueue.get(key);
+		if (f.size() > 1)
+			return f.remove(0);
+		else
+			return requestsQueue.remove(key).get(0);
 	}
 
 	@Override
@@ -104,52 +116,58 @@ public class RedBlackTree implements IQueue{
 	@Override
 	public void insert(Job j) {
 		if (!requestsQueue.containsKey(getKey(j))) {
-			requestsQueue.put(getKey(j), j);
+			ArrayList<Job> list = new ArrayList<>();
+			list.add(j);
+			requestsQueue.put(getKey(j), list);
 		} else {
-			//COLLISIONI
-			//CFS:
+			// COLLISIONI
+			// CFS:
 			/**
-			We dont care about collisions. Nodes with
-			the same key stay together.
-			*/
-			//TODO
+			 * We dont care about collisions. Nodes with the same key stay
+			 * together.
+			 */
+			requestsQueue.get(getKey(j)).add(j);
 		}
 	}
 
 	@Override
 	public Job extract() {
-		if(requestsQueue.isEmpty())
+		if (requestsQueue.isEmpty())
 			return null;
-		
-		setCurr(requestsQueue.remove(requestsQueue.firstKey()));
+
+		List<Job> f = requestsQueue.get(requestsQueue.firstKey());
+		if (f.size() > 1)
+			setCurr(f.remove(0));
+		else
+			setCurr(requestsQueue.remove(requestsQueue.firstKey()).get(0));
 		return getCurr();
 	}
-	
-	public Job lookup(){
-		if(requestsQueue.size()>0)
-		return requestsQueue.get(requestsQueue.firstKey());
-		else return null;
+
+	public Job lookup() {
+		if (requestsQueue.size() > 0) {
+			List<Job> f = requestsQueue.get(requestsQueue.firstKey());
+			return f.get(0);
+		} else
+			return null;
 	}
-	
+
 	/**
-	 * Then the tasks are ordered
-	 *	according to the key equal to 
-	 *	
-	 *	current_vruntime - min_vruntime, 
-	 *	
-	 *	where current runtime is the virtual runtime 
-	 *	of the current task and min_vruntime the
-	 *	smallest virtual runtime within the nodes on the tree
+	 * Then the tasks are ordered according to the key equal to
+	 * 
+	 * current_vruntime - min_vruntime,
+	 * 
+	 * where current runtime is the virtual runtime of the current task and
+	 * min_vruntime the smallest virtual runtime within the nodes on the tree
 	 * 
 	 * */
-	
-	public int getKey(Job job){
+
+	public int getKey(Job job) {
 		return job.getVruntime() - getMin_Vrtime();
-//		return job.getVruntime();
-//		return (job.getFair_clock() - job.getWait_runtime());
+		// return job.getVruntime();
+		// return (job.getFair_clock() - job.getWait_runtime());
 	}
-	
-	public Integer getMin_Vrtime(){
+
+	public Integer getMin_Vrtime() {
 		return requestsQueue.size() != 0 ? requestsQueue.firstKey() : 0;
 	}
 
@@ -160,5 +178,5 @@ public class RedBlackTree implements IQueue{
 	public void setCurr(Job curr) {
 		this.curr = curr;
 	}
-	
+
 }

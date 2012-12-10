@@ -18,7 +18,7 @@ public class HPSsim {
 		int qt = 210;
 		double classificationRate = 0.95D;
 		double realTimeJobsProb = 0.45D;
-		double percentOpenCLjob = 0.25D;
+		double percentOpenCLjob = 0.35D;
 		int avgta = 230;
 
 		Hardware hw = new Hardware(8, 2);

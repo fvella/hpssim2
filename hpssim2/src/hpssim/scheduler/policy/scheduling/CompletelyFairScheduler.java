@@ -13,7 +13,7 @@ import hpssim.simulator.Job;
  */
 public class CompletelyFairScheduler implements SchedulingPolicy {
 
-	private boolean logEnable = false;
+	private boolean logEnable = true;
 
 	// QUEUE CFS
 	private RedBlackTree cfs_rq;
@@ -100,7 +100,7 @@ public class CompletelyFairScheduler implements SchedulingPolicy {
 
 	public CompletelyFairScheduler(Hardware hw, EventList evl) {
 
-		int ncpu = hw.numcpus() + hw.numgpus();
+		int ncpu = hw.numcpus() /*+ hw.numgpus()*/;
 
 		sysctl_sched_latency = 20 * (1 + ncpu);
 		sysctl_sched_min_granularity = 4 * (1 + ncpu);

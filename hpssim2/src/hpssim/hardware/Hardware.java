@@ -152,5 +152,9 @@ public class Hardware {
     public int getGPUfree(){
         return this.gpusfree;
     }
+
+	public int getNumGPU() {
+		return ngpu;
+	}
 }
 

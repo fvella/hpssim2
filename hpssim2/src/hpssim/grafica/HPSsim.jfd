@@ -1,0 +1,312 @@
+JFDML JFormDesigner: "5.1.0.0.51" Java: "1.7.0_03" encoding: "UTF-8"
+
+new FormModel {
+	contentType: "form/swing"
+	root: new FormRoot {
+		auxiliary() {
+			"JavaCodeGenerator.bindingInitMethod": true
+		}
+		add( new FormWindow( "javax.swing.JFrame", new FormLayoutManager( class org.jdesktop.layout.GroupLayout ) {
+			"$horizontalGroup": "par l {seq t {space :0:0:x, comp HPSsim:::p:565:p}}"
+			"$verticalGroup": "par l {seq l {comp HPSsim:::p:485:p, space :0:4:x}}"
+		} ) {
+			name: "HPSsimWindow"
+			"defaultCloseOperation": 3
+			auxiliary() {
+				"JavaCodeGenerator.variableModifiers": 1
+			}
+			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jformdesigner.runtime.NullLayout ) ) {
+				name: "HPSsim"
+				"foreground": sfield java.awt.Color blue
+				auxiliary() {
+					"JavaCodeGenerator.variableName": "hpssimWindow"
+				}
+				add( new FormContainer( "javax.swing.JTabbedPane", new FormLayoutManager( class javax.swing.JTabbedPane ) ) {
+					name: "Tab"
+					auxiliary() {
+						"JavaCodeGenerator.variableName": "hpssimTab"
+					}
+					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class info.clearthought.layout.TableLayout ) {
+						"$columnSpecs": "1.0, 70.0, 70.0, 70.0, 68.0, 70.0, 70.0, 74.0"
+						"$rowSpecs": "0.01, 27.0, 21.0, 26.0, 27.0, 25.0, 25.0, 25.0, pref, 25.0, pref, pref, pref"
+						"hGap": 5
+						"vGap": 5
+					} ) {
+						name: "panelConfiguration"
+						add( new FormComponent( "javax.swing.JLabel" ) {
+							name: "label10"
+							"text": "Hardware"
+							"font": new java.awt.Font( "Segoe UI", 2, 16 )
+						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+							"gridX": 1
+							"gridY": 1
+							"gridWidth": 7
+							"hAlign": 1
+						} )
+						add( new FormComponent( "javax.swing.JLabel" ) {
+							name: "label3"
+							"text": "CPU"
+							"font": new java.awt.Font( "Segoe UI", 0, 12 )
+							"labelFor": new FormReference( "ncpu" )
+						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+							"gridX": 1
+							"gridY": 2
+							"hAlign": 3
+						} )
+						add( new FormComponent( "javax.swing.JTextField" ) {
+							name: "ncpu"
+						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+							"gridX": 2
+							"gridY": 2
+							"gridWidth": 2
+						} )
+						add( new FormComponent( "javax.swing.JLabel" ) {
+							name: "label4"
+							"text": "GPU"
+							"font": new java.awt.Font( "Segoe UI", 0, 12 )
+							"labelFor": new FormReference( "ngpu" )
+						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+							"gridY": 2
+							"hAlign": 3
+							"gridX": 4
+						} )
+						add( new FormComponent( "javax.swing.JTextField" ) {
+							name: "ngpu"
+						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+							"gridX": 5
+							"gridY": 2
+							"gridWidth": 2
+						} )
+						add( new FormComponent( "com.jformdesigner.designer.wrapper.VSpacer" ) {
+							name: "vSpacer1"
+						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+							"gridX": 1
+							"gridY": 3
+							"gridWidth": 7
+						} )
+						add( new FormComponent( "javax.swing.JLabel" ) {
+							name: "label11"
+							"text": "Simulation"
+							"font": new java.awt.Font( "Segoe UI", 2, 16 )
+						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+							"gridX": 1
+							"gridY": 4
+							"gridWidth": 7
+							"hAlign": 1
+						} )
+						add( new FormComponent( "javax.swing.JLabel" ) {
+							name: "label1"
+							"text": "Numero di job"
+						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+							"hAlign": 3
+							"vAlign": 1
+							"gridX": 1
+							"gridY": 5
+						} )
+						add( new FormComponent( "javax.swing.JSlider" ) {
+							name: "sliderJob"
+							"value": 0
+							addEvent( new FormEvent( "javax.swing.event.ChangeListener", "stateChanged", "sliderJobStateChanged", true ) )
+						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+							"gridX": 2
+							"gridY": 5
+							"gridWidth": 3
+						} )
+						add( new FormComponent( "javax.swing.JTextField" ) {
+							name: "textFieldNjob"
+							"enabled": false
+							"editable": false
+							"text": "0"
+						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+							"gridX": 5
+							"gridY": 5
+						} )
+						add( new FormComponent( "javax.swing.JLabel" ) {
+							name: "label9"
+							"text": "Media arrivo"
+						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+							"gridX": 6
+							"gridY": 5
+							"hAlign": 3
+						} )
+						add( new FormComponent( "javax.swing.JTextField" ) {
+							name: "textFieldQVGA"
+						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+							"gridX": 7
+							"gridY": 5
+						} )
+						add( new FormComponent( "javax.swing.JLabel" ) {
+							name: "label6"
+							"text": "Scheduler"
+						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+							"gridX": 1
+							"gridY": 7
+							"hAlign": 3
+						} )
+						add( new FormComponent( "javax.swing.JComboBox" ) {
+							name: "comboBoxScheduler"
+							"model": new javax.swing.DefaultComboBoxModel {
+								selectedItem: "Priority Round Robin"
+								addElement( "Priority Round Robin" )
+								addElement( "Completely Fair Scheduler" )
+							}
+						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+							"gridX": 2
+							"gridY": 7
+							"gridWidth": 4
+						} )
+						add( new FormComponent( "javax.swing.JLabel" ) {
+							name: "label8"
+							"text": "Time Slice"
+						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+							"gridX": 6
+							"gridY": 7
+							"hAlign": 3
+						} )
+						add( new FormComponent( "javax.swing.JTextField" ) {
+							name: "textFieldTimeSlice"
+						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+							"gridX": 7
+							"gridY": 7
+						} )
+						add( new FormComponent( "javax.swing.JLabel" ) {
+							name: "label7"
+							"text": "Queue"
+						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+							"gridX": 1
+							"gridY": 8
+							"hAlign": 3
+						} )
+						add( new FormComponent( "javax.swing.JComboBox" ) {
+							name: "comboBoxQueue"
+							"model": new javax.swing.DefaultComboBoxModel {
+								selectedItem: "FIFO"
+								addElement( "FIFO" )
+								addElement( "Highest Priority First" )
+								addElement( "Shortest Job First" )
+								addElement( "Round Robin" )
+								addElement( "Random Queue" )
+							}
+						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+							"gridX": 2
+							"gridY": 8
+							"gridWidth": 4
+						} )
+						add( new FormComponent( "javax.swing.JLabel" ) {
+							name: "label12"
+							"text": "RT Job Prob"
+						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+							"gridX": 1
+							"gridY": 10
+							"hAlign": 3
+						} )
+						add( new FormComponent( "javax.swing.JSlider" ) {
+							name: "sliderRTJob"
+							"value": 0
+						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+							"gridX": 2
+							"gridY": 10
+						} )
+						add( new FormComponent( "javax.swing.JLabel" ) {
+							name: "label13"
+							"text": "0%"
+						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+							"gridX": 3
+							"gridY": 10
+						} )
+						add( new FormComponent( "javax.swing.JLabel" ) {
+							name: "label14"
+							"text": "OpenCL Job "
+						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+							"gridX": 5
+							"gridY": 10
+							"hAlign": 3
+						} )
+						add( new FormComponent( "javax.swing.JSlider" ) {
+							name: "sliderOpenCl"
+							"value": 0
+						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+							"gridX": 6
+							"gridY": 10
+						} )
+						add( new FormComponent( "javax.swing.JLabel" ) {
+							name: "label15"
+							"text": "0%"
+						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+							"gridX": 7
+							"gridY": 10
+						} )
+						add( new FormComponent( "javax.swing.JButton" ) {
+							name: "resetButton"
+							"text": "Reset"
+							addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "resetButtonActionPerformed", true ) )
+							addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "resetButtonActionPerformed", true ) )
+						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+							"gridX": 6
+							"gridY": 12
+						} )
+						add( new FormComponent( "javax.swing.JButton" ) {
+							name: "okButton"
+							"text": "OK"
+							addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "okButtonActionPerformed", true ) )
+						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+							"gridX": 7
+							"gridY": 12
+						} )
+					}, new FormLayoutConstraints( null ) {
+						"title": "Configuration"
+					} )
+					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridLayout ) ) {
+						name: "panelProcesses"
+					}, new FormLayoutConstraints( null ) {
+						"title": "Processes"
+					} )
+					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class org.jdesktop.layout.GroupLayout ) {
+						"$horizontalGroup": "par l {space :0:540:x}"
+						"$verticalGroup": "par l {space :0:366:x}"
+					} ) {
+						name: "panelPerformance"
+					}, new FormLayoutConstraints( null ) {
+						"title": "Performance"
+					} )
+					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class org.jdesktop.layout.GroupLayout ) {
+						"$horizontalGroup": "par l {space :0:540:x}"
+						"$verticalGroup": "par l {space :0:366:x}"
+					} ) {
+						name: "panelGraph"
+					}, new FormLayoutConstraints( null ) {
+						"title": "Graph"
+					} )
+				}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+					"x": 10
+					"y": 40
+				} )
+				add( new FormComponent( "com.jformdesigner.designer.wrapper.JGoodiesFormsTitle" ) {
+					name: "title1"
+					"textWithMnemonic": "HPSsim 2.0 "
+					"font": new com.jformdesigner.model.SwingDerivedFont( null, 0, 8, false )
+				}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+					"x": 10
+					"y": 11
+					"width": 132
+				} )
+				add( new FormComponent( "javax.swing.JProgressBar" ) {
+					name: "progressBar1"
+				}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+					"x": 10
+					"y": 445
+					"width": 545
+					"height": 29
+				} )
+			} )
+		}, new FormLayoutConstraints( null ) {
+			"location": new java.awt.Point( 5, 0 )
+			"size": new java.awt.Dimension( 580, 525 )
+		} )
+		add( new FormComponent( "javax.swing.JSpinner" ) {
+			name: "spinner1"
+		}, new FormLayoutConstraints( null ) {
+			"location": new java.awt.Point( 680, 265 )
+		} )
+	}
+}

@@ -135,6 +135,10 @@ public class Simulator implements Runnable {
 			}
 
 			job.printJob();
+			
+			if(hw.getNumGPU()==0)
+				job.setClassification(0);
+			
 			if (job.classification == 0)
 				cpujobs++;
 			else

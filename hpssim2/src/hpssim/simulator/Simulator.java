@@ -5,7 +5,6 @@ import hpssim.scheduler.EventWorkFlow;
 import hpssim.scheduler.policy.queue.FIFO;
 import hpssim.scheduler.policy.queue.IQueue;
 import hpssim.scheduler.policy.scheduling.CompletelyFairScheduler;
-import hpssim.scheduler.policy.scheduling.HPSSimScheduler;
 import hpssim.scheduler.policy.scheduling.SchedulingPolicy;
 
 import org.apache.commons.math3.random.RandomDataImpl;
@@ -14,10 +13,12 @@ import org.apache.commons.math3.random.RandomDataImpl;
  * 
  * @author Igor Neri <igor@cimice.net>
  */
-public class Simulator implements Runnable {
+public class Simulator extends Thread {
 
 	public double classificationRate;
 	public static int tq; // quantum base time
+	
+	public boolean run = true;
 
 	private int avgta;
 	private EventList events = new EventList();
@@ -33,7 +34,7 @@ public class Simulator implements Runnable {
 
 	public IQueue jobended = new FIFO();
 
-	public Simulator(Hardware _hw, int _njobs, int _quantum, double _classificationRate, double _realTimeJobsProb, double _hjobrate, int _avgta) {
+	public Simulator(Hardware _hw, int _njobs, int _quantum, double _classificationRate, double _realTimeJobsProb, double _hjobrate, int _avgta, double _simTime) {
 
 		Simulator.tq = _quantum;
 		this.njobs = _njobs;
@@ -42,6 +43,8 @@ public class Simulator implements Runnable {
 		this.hjobrate = _hjobrate;
 		this.hw = _hw;
 		this.avgta = _avgta;
+		
+		time_sim = _simTime;
 
 	}
 
@@ -218,9 +221,9 @@ public class Simulator implements Runnable {
 		this.tq = nqt;
 	}
 
-	@Override
 	public void run() {
 		try {
+			init();
 			simulate();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -228,14 +231,18 @@ public class Simulator implements Runnable {
 		}
 	}
 
-	public synchronized void simulate() throws Exception {
+	public void simulate() throws Exception {
 		System.out.println("Start simulation...");
 		System.out.println("Current Event - Ta - Next Event Generate - Ta - Device Status - Queue Size | Queue");
 		int lastEvTime = 0;
 		int i = 0;
+		
+		
 		synchronized (events) {
-			while (lastEvTime < (time_sim) && (!events.list.isEmpty())) {
-
+			while (run && lastEvTime < (time_sim) && (!events.list.isEmpty())) {
+				
+				wait();
+				
 				Event ev = clock();
 				lastEvTime = ev.time;
 				// printProgBar((int) (lastEvTime / time_sim * 100));
@@ -245,7 +252,10 @@ public class Simulator implements Runnable {
 				i++;
 			}
 		}
+		
 
+		notify();
+		
 		// q.printpriority();
 		// jobended.printjob();
 		System.out.println("");

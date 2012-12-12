@@ -3,6 +3,7 @@ package hpssim.main;
 import hpssim.grafica.HPSsim;
 
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 
 
 public class Main {
@@ -16,6 +17,7 @@ public class Main {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				try {
+					UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
 					HPSsim window = new HPSsim();
 					window.HPSsimWindow.setVisible(true);
 				} catch (Exception e) {

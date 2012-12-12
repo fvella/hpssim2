@@ -7,8 +7,8 @@ new FormModel {
 			"JavaCodeGenerator.bindingInitMethod": true
 		}
 		add( new FormWindow( "javax.swing.JFrame", new FormLayoutManager( class org.jdesktop.layout.GroupLayout ) {
-			"$horizontalGroup": "par l {seq t {space :0:0:x, comp HPSsim:::p:565:p}}"
-			"$verticalGroup": "par l {seq l {comp HPSsim:::p:485:p, space :0:4:x}}"
+			"$horizontalGroup": "par l {seq t {space :0:0:x, comp HPSsim:::p:565:p}, seq t {space :::x, comp button1:::p:74:p, space :::p, comp okButton:::p:74:p, space :p:21:p}}"
+			"$verticalGroup": "par l {seq l {comp HPSsim:::p:485:p, space :::p, par b {comp okButton::b:p::p, comp button1::b:p::p}, space :0:10:x}}"
 		} ) {
 			name: "HPSsimWindow"
 			"defaultCloseOperation": 3
@@ -28,7 +28,7 @@ new FormModel {
 					}
 					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class info.clearthought.layout.TableLayout ) {
 						"$columnSpecs": "1.0, 70.0, 70.0, 70.0, 68.0, 70.0, 70.0, 74.0"
-						"$rowSpecs": "0.01, 27.0, 21.0, 26.0, 27.0, 25.0, 25.0, 25.0, pref, 25.0, pref, pref, pref"
+						"$rowSpecs": "0.01, 27.0, 21.0, 26.0, 27.0, 25.0, 25.0, 25.0, 21.0, 21.0, pref, pref, pref, pref, pref"
 						"hGap": 5
 						"vGap": 5
 					} ) {
@@ -55,6 +55,7 @@ new FormModel {
 						} )
 						add( new FormComponent( "javax.swing.JTextField" ) {
 							name: "ncpu"
+							"text": "0"
 						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
 							"gridX": 2
 							"gridY": 2
@@ -72,6 +73,7 @@ new FormModel {
 						} )
 						add( new FormComponent( "javax.swing.JTextField" ) {
 							name: "ngpu"
+							"text": "0"
 						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
 							"gridX": 5
 							"gridY": 2
@@ -95,52 +97,76 @@ new FormModel {
 							"hAlign": 1
 						} )
 						add( new FormComponent( "javax.swing.JLabel" ) {
+							name: "label2"
+							"text": "Sim Time"
+						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+							"gridX": 1
+							"gridY": 5
+							"hAlign": 3
+						} )
+						add( new FormComponent( "javax.swing.JSlider" ) {
+							name: "sliderSimulationTime"
+							"value": 0
+							"maximum": 10000
+							addEvent( new FormEvent( "javax.swing.event.ChangeListener", "stateChanged", "sliderSimulationTimeStateChanged", true ) )
+						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+							"gridX": 2
+							"gridY": 5
+							"gridWidth": 5
+						} )
+						add( new FormComponent( "javax.swing.JLabel" ) {
+							name: "textFieldSimTime"
+							"text": "0 ms"
+						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+							"gridX": 7
+							"gridY": 5
+						} )
+						add( new FormComponent( "javax.swing.JLabel" ) {
 							name: "label1"
 							"text": "Numero di job"
 						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
 							"hAlign": 3
 							"vAlign": 1
 							"gridX": 1
-							"gridY": 5
+							"gridY": 6
 						} )
 						add( new FormComponent( "javax.swing.JSlider" ) {
 							name: "sliderJob"
 							"value": 0
+							"maximum": 1000
 							addEvent( new FormEvent( "javax.swing.event.ChangeListener", "stateChanged", "sliderJobStateChanged", true ) )
 						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
 							"gridX": 2
-							"gridY": 5
+							"gridY": 6
 							"gridWidth": 3
 						} )
-						add( new FormComponent( "javax.swing.JTextField" ) {
+						add( new FormComponent( "javax.swing.JLabel" ) {
 							name: "textFieldNjob"
-							"enabled": false
-							"editable": false
 							"text": "0"
 						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
 							"gridX": 5
-							"gridY": 5
+							"gridY": 6
 						} )
 						add( new FormComponent( "javax.swing.JLabel" ) {
 							name: "label9"
 							"text": "Media arrivo"
 						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
 							"gridX": 6
-							"gridY": 5
+							"gridY": 6
 							"hAlign": 3
 						} )
 						add( new FormComponent( "javax.swing.JTextField" ) {
 							name: "textFieldQVGA"
 						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
 							"gridX": 7
-							"gridY": 5
+							"gridY": 6
 						} )
 						add( new FormComponent( "javax.swing.JLabel" ) {
 							name: "label6"
 							"text": "Scheduler"
 						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
 							"gridX": 1
-							"gridY": 7
+							"gridY": 8
 							"hAlign": 3
 						} )
 						add( new FormComponent( "javax.swing.JComboBox" ) {
@@ -150,9 +176,10 @@ new FormModel {
 								addElement( "Priority Round Robin" )
 								addElement( "Completely Fair Scheduler" )
 							}
+							addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "comboBoxSchedulerActionPerformed", true ) )
 						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
 							"gridX": 2
-							"gridY": 7
+							"gridY": 8
 							"gridWidth": 4
 						} )
 						add( new FormComponent( "javax.swing.JLabel" ) {
@@ -160,21 +187,21 @@ new FormModel {
 							"text": "Time Slice"
 						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
 							"gridX": 6
-							"gridY": 7
+							"gridY": 8
 							"hAlign": 3
 						} )
 						add( new FormComponent( "javax.swing.JTextField" ) {
 							name: "textFieldTimeSlice"
 						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
 							"gridX": 7
-							"gridY": 7
+							"gridY": 8
 						} )
 						add( new FormComponent( "javax.swing.JLabel" ) {
 							name: "label7"
 							"text": "Queue"
 						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
 							"gridX": 1
-							"gridY": 8
+							"gridY": 9
 							"hAlign": 3
 						} )
 						add( new FormComponent( "javax.swing.JComboBox" ) {
@@ -189,7 +216,7 @@ new FormModel {
 							}
 						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
 							"gridX": 2
-							"gridY": 8
+							"gridY": 9
 							"gridWidth": 4
 						} )
 						add( new FormComponent( "javax.swing.JLabel" ) {
@@ -197,89 +224,266 @@ new FormModel {
 							"text": "RT Job Prob"
 						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
 							"gridX": 1
-							"gridY": 10
+							"gridY": 11
 							"hAlign": 3
 						} )
 						add( new FormComponent( "javax.swing.JSlider" ) {
 							name: "sliderRTJob"
 							"value": 0
+							addEvent( new FormEvent( "javax.swing.event.ChangeListener", "stateChanged", "sliderRTJobStateChanged", true ) )
 						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
 							"gridX": 2
-							"gridY": 10
+							"gridY": 11
 						} )
 						add( new FormComponent( "javax.swing.JLabel" ) {
-							name: "label13"
+							name: "labelRT"
 							"text": "0%"
 						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
 							"gridX": 3
-							"gridY": 10
+							"gridY": 11
 						} )
 						add( new FormComponent( "javax.swing.JLabel" ) {
 							name: "label14"
 							"text": "OpenCL Job "
 						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
 							"gridX": 5
-							"gridY": 10
+							"gridY": 11
 							"hAlign": 3
 						} )
 						add( new FormComponent( "javax.swing.JSlider" ) {
 							name: "sliderOpenCl"
 							"value": 0
+							addEvent( new FormEvent( "javax.swing.event.ChangeListener", "stateChanged", "sliderOpenClStateChanged", true ) )
 						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
 							"gridX": 6
-							"gridY": 10
+							"gridY": 11
 						} )
 						add( new FormComponent( "javax.swing.JLabel" ) {
-							name: "label15"
+							name: "labelOPENCL"
 							"text": "0%"
 						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
 							"gridX": 7
-							"gridY": 10
+							"gridY": 11
+						} )
+						add( new FormComponent( "javax.swing.JLabel" ) {
+							name: "label21"
+							"text": "Class Rate"
+						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+							"gridX": 1
+							"gridY": 13
+							"hAlign": 3
+						} )
+						add( new FormComponent( "javax.swing.JSlider" ) {
+							name: "sliderclassRate"
+							"value": 90
+							addEvent( new FormEvent( "javax.swing.event.ChangeListener", "stateChanged", "sliderclassRateStateChanged", true ) )
+						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+							"gridX": 2
+							"gridY": 13
+							"gridWidth": 3
+						} )
+						add( new FormComponent( "javax.swing.JLabel" ) {
+							name: "labelclassRate"
+							"text": "90%"
+						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+							"gridX": 5
+							"gridY": 13
 						} )
 						add( new FormComponent( "javax.swing.JButton" ) {
 							name: "resetButton"
 							"text": "Reset"
 							addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "resetButtonActionPerformed", true ) )
 							addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "resetButtonActionPerformed", true ) )
-						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
-							"gridX": 6
-							"gridY": 12
-						} )
-						add( new FormComponent( "javax.swing.JButton" ) {
-							name: "okButton"
-							"text": "OK"
-							addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "okButtonActionPerformed", true ) )
+							addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "resetButtonActionPerformed", true ) )
 						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
 							"gridX": 7
-							"gridY": 12
+							"gridY": 13
 						} )
 					}, new FormLayoutConstraints( null ) {
 						"title": "Configuration"
 					} )
 					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.GridLayout ) ) {
 						name: "panelProcesses"
+						add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
+							name: "scrollPane1"
+							add( new FormComponent( "javax.swing.JTable" ) {
+								name: "tableProcess"
+								"model": new com.jformdesigner.model.SwingTableModel( new java.util.Vector {
+									add( new java.util.Vector {
+										add( null )
+										add( null )
+										add( null )
+										add( "" )
+										add( null )
+										add( null )
+									} )
+									add( new java.util.Vector {
+										add( null )
+										add( null )
+										add( null )
+										add( null )
+										add( null )
+										add( null )
+									} )
+								}, new java.util.Vector {
+									add( "Name" )
+									add( "Time Arrival" )
+									add( "Classification" )
+									add( "Nice" )
+									add( "Type" )
+									add( "Remaing Time" )
+								}, new java.util.Vector {
+									add( null )
+									add( null )
+									add( null )
+									add( null )
+									add( null )
+									add( null )
+								}, new java.util.Vector {
+									add( null )
+									add( null )
+									add( null )
+									add( null )
+									add( null )
+									add( null )
+								}, new java.util.Vector {
+									add( null )
+									add( null )
+									add( null )
+									add( null )
+									add( null )
+									add( null )
+								} )
+								auxiliary() {
+									"JavaCodeGenerator.variableGetter": true
+								}
+							} )
+						} )
 					}, new FormLayoutConstraints( null ) {
 						"title": "Processes"
 					} )
 					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class org.jdesktop.layout.GroupLayout ) {
-						"$horizontalGroup": "par l {space :0:540:x}"
-						"$verticalGroup": "par l {space :0:366:x}"
-					} ) {
-						name: "panelPerformance"
-					}, new FormLayoutConstraints( null ) {
-						"title": "Performance"
-					} )
-					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class org.jdesktop.layout.GroupLayout ) {
-						"$horizontalGroup": "par l {space :0:540:x}"
-						"$verticalGroup": "par l {space :0:366:x}"
+						"$horizontalGroup": "par l {seq l {space :::p, comp graphPanel::::520:x, space :::p}}"
+						"$verticalGroup": "par l {seq l {space :::p, comp graphPanel::::390:x, space :::p}}"
 					} ) {
 						name: "panelGraph"
+						add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.BorderLayout ) ) {
+							name: "graphPanel"
+						} )
 					}, new FormLayoutConstraints( null ) {
 						"title": "Graph"
+					} )
+					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class org.jdesktop.layout.GroupLayout ) {
+						"$horizontalGroup": "par l {seq {space :::p, par l {seq {comp panelCPU:::p:241:p, space :::x, comp panelGPU:::p:241:p}, comp panel1::l::520:x, comp separator1::t:::x}, space :::p}}"
+						"$verticalGroup": "par l {seq l {space :p:38:p, par t {comp panelCPU:::p:205:p, comp panelGPU:::p:205:p}, space s:::p, comp separator1:::p::p, space :::p, comp panel1::::132:x, space :::p}}"
+					} ) {
+						name: "panelPerformance"
+						add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.BorderLayout ) ) {
+							name: "panelCPU"
+						} )
+						add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.BorderLayout ) ) {
+							name: "panelGPU"
+						} )
+						add( new FormComponent( "javax.swing.JSeparator" ) {
+							name: "separator1"
+						} )
+						add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class info.clearthought.layout.TableLayout ) {
+							"$columnSpecs": "pref, 114.0, 72.0, pref, pref, pref, pref, 114.0, 72.0"
+							"$rowSpecs": "pref, pref, pref, pref, pref"
+							"hGap": 5
+							"vGap": 5
+						} ) {
+							name: "panel1"
+							add( new FormComponent( "javax.swing.JLabel" ) {
+								name: "label18"
+								"text": "Virtual Time"
+							}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+								"gridX": 1
+							} )
+							add( new FormComponent( "javax.swing.JTextField" ) {
+								name: "virtualTime"
+							}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+								"gridX": 2
+							} )
+							add( new FormComponent( "javax.swing.JLabel" ) {
+								name: "label5"
+								"text": "Processi nel sistema"
+							}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+								"gridX": 1
+								"gridY": 2
+							} )
+							add( new FormComponent( "javax.swing.JTextField" ) {
+								name: "processiNelSistema"
+								"text": "0"
+							}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+								"gridX": 2
+								"gridY": 2
+							} )
+							add( new FormComponent( "javax.swing.JLabel" ) {
+								name: "label19"
+								"text": "Media Utilizzo CPU"
+							}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+								"gridX": 7
+								"gridY": 2
+							} )
+							add( new FormComponent( "javax.swing.JTextField" ) {
+								name: "mediaUsoCPU"
+								"text": "0"
+							}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+								"gridX": 8
+								"gridY": 2
+							} )
+							add( new FormComponent( "javax.swing.JLabel" ) {
+								name: "label17"
+								"text": "Processi in elaborazione"
+							}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+								"gridX": 1
+								"gridY": 3
+							} )
+							add( new FormComponent( "javax.swing.JTextField" ) {
+								name: "processiElaborazione"
+								"text": "0"
+							}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+								"gridX": 2
+								"gridY": 3
+							} )
+							add( new FormComponent( "javax.swing.JLabel" ) {
+								name: "label20"
+								"text": "Media Utilizzo GPU"
+							}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+								"gridX": 7
+								"gridY": 3
+							} )
+							add( new FormComponent( "javax.swing.JTextField" ) {
+								name: "mediaUsoGPU"
+								"text": "0"
+							}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+								"gridX": 8
+								"gridY": 3
+							} )
+							add( new FormComponent( "javax.swing.JLabel" ) {
+								name: "label16"
+								"text": "Processi in coda"
+							}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+								"gridX": 1
+								"gridY": 4
+							} )
+							add( new FormComponent( "javax.swing.JTextField" ) {
+								name: "processiInCoda"
+								"text": "0"
+							}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+								"gridX": 2
+								"gridY": 4
+							} )
+						} )
+					}, new FormLayoutConstraints( null ) {
+						"title": "Performance"
 					} )
 				}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
 					"x": 10
 					"y": 40
+					"width": 545
+					"height": 440
 				} )
 				add( new FormComponent( "com.jformdesigner.designer.wrapper.JGoodiesFormsTitle" ) {
 					name: "title1"
@@ -290,18 +494,20 @@ new FormModel {
 					"y": 11
 					"width": 132
 				} )
-				add( new FormComponent( "javax.swing.JProgressBar" ) {
-					name: "progressBar1"
-				}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-					"x": 10
-					"y": 445
-					"width": 545
-					"height": 29
-				} )
+			} )
+			add( new FormComponent( "javax.swing.JButton" ) {
+				name: "okButton"
+				"text": "Start"
+				addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "okButtonActionPerformed", true ) )
+				addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "okButtonActionPerformed", true ) )
+			} )
+			add( new FormComponent( "javax.swing.JButton" ) {
+				name: "button1"
+				"text": "Stop"
 			} )
 		}, new FormLayoutConstraints( null ) {
 			"location": new java.awt.Point( 5, 0 )
-			"size": new java.awt.Dimension( 580, 525 )
+			"size": new java.awt.Dimension( 580, 560 )
 		} )
 		add( new FormComponent( "javax.swing.JSpinner" ) {
 			name: "spinner1"

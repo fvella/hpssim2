@@ -1,9 +1,12 @@
 package hpssim.main;
 
-import hpssim.grafica.HPSsim;
-
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+
+import hpssim.grafica.HPSsim;
+import hpssim.hardware.Hardware;
+import hpssim.scheduler.Configurator;
+import hpssim.simulator.Simulator;
 
 
 public class Main {
@@ -39,11 +42,21 @@ public class Main {
 //		int avgta = 230;
 //
 //		Hardware hw = new Hardware(4, 2);
-//
-//		Simulator sim = new Simulator(hw, njobs, qt, classificationRate, realTimeJobsProb, percentOpenCLjob, avgta);
+//		
+//		Configurator conf = null;
+//		try {
+//			conf = new Configurator(hw, njobs, qt, classificationRate, realTimeJobsProb, percentOpenCLjob, avgta, 1000000);
+//		} catch (Exception e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		
+//		Simulator sim = new Simulator(conf, new HPSsim());
+//		
 //		sim.init();
 //		sim.run();
 //
 //		System.out.println(System.currentTimeMillis() - test);
-	}
+	
+}
 

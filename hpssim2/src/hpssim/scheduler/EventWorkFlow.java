@@ -67,14 +67,14 @@ public class EventWorkFlow {
 	 * @see hpssim.scheduler.IScheduler#requeue(hpssim.EventList, hpssim.Event,
 	 * hpssim.DeviceList, hpssim.Queue)
 	 */
-	public static Event requeue(SchedulingPolicy scheduler, EventList evl, Event ev, Hardware hw) {
+	public static Event requeue(SchedulingPolicy scheduler, EventList evl, Event ev, Hardware hw, int timeslice) {
 		// System.out.println("REQUEUE");
 		System.out.print("ENEQUEUE " + (ev.time) + " " + hw.getCPUfree() + " " + hw.getGPUfree() + " " + scheduler.size() + " ");
 		Event ev1;
 		Job j = hw.teminate(ev.job.getId());
 		j.setPs(j.getPriority() - 5);
-		j.remainingTime -= Simulator.tq;
-		j.executionTime += Simulator.tq;
+		j.remainingTime -= timeslice;
+		j.executionTime += timeslice;
 		j.rescheduled++;
 		ev1 = new Event(j, Event.ENQUEUE, ev.time);
 		evl.insertEvent(ev1);

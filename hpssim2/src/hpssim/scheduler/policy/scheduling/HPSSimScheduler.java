@@ -11,13 +11,15 @@ import hpssim.simulator.Simulator;
 public class HPSSimScheduler implements SchedulingPolicy {
 
 	private IQueue queue;
+	private int timeslice;
 
-	public HPSSimScheduler(Class<? extends HPSSimQueue> queueType) {
+	public HPSSimScheduler(Class<? extends HPSSimQueue> queueType, int timeslice) {
 		try {
 			queue = queueType.newInstance();
 		} catch (InstantiationException | IllegalAccessException e) {
 			e.printStackTrace();
 		}
+		this.timeslice = timeslice;
 	}
 
 	@Override
@@ -67,12 +69,12 @@ public class HPSSimScheduler implements SchedulingPolicy {
 				} else {
 					hw.assignJobtoCPU(j);
 				}
-				if ((j.remainingTime > Simulator.tq) && (!gpurun)) {
+				if ((j.remainingTime > timeslice) && (!gpurun)) {
 					// REQUEUE //SETTA LA NUOVA PRIORITA' //SETTA IL TEMPO
 					// RIMANENTE
 					// j.rescheduled++;
-					evl.insertEvent(new Event(j, Event.REQUEUE, timeEv + Simulator.tq));
-					System.out.print("REQUEUE " + (timeEv + Simulator.tq) + " " + hw.getCPUfree() + " " + hw.getGPUfree() + " " + queue.size() + " ");
+					evl.insertEvent(new Event(j, Event.REQUEUE, timeEv + timeslice));
+					System.out.print("REQUEUE " + (timeEv + timeslice) + " " + hw.getCPUfree() + " " + hw.getGPUfree() + " " + queue.size() + " ");
 					// evl.insertEvent(ev1);
 				} else { // FINALIZE
 					evl.insertEvent(new Event(j, Event.FINALIZE, timeEv + j.remainingTime));

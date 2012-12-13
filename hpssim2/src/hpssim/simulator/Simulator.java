@@ -1,11 +1,16 @@
 package hpssim.simulator;
 
+import hpssim.grafica.HPSsim;
 import hpssim.hardware.Hardware;
+import hpssim.scheduler.Configurator;
 import hpssim.scheduler.EventWorkFlow;
 import hpssim.scheduler.policy.queue.FIFO;
 import hpssim.scheduler.policy.queue.IQueue;
 import hpssim.scheduler.policy.scheduling.CompletelyFairScheduler;
 import hpssim.scheduler.policy.scheduling.SchedulingPolicy;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.commons.math3.random.RandomDataImpl;
 
@@ -15,10 +20,13 @@ import org.apache.commons.math3.random.RandomDataImpl;
  */
 public class Simulator extends Thread {
 
+	private static Logger logger = Logger.getLogger("hpssim.simulator.Simulator");
+	private boolean infoLog = true;
+
 	public double classificationRate;
-	public static int tq; // quantum base time
-	
-	public boolean run = true;
+	public int tq; // quantum base time
+
+	public boolean run = false;
 
 	private int avgta;
 	private EventList events = new EventList();
@@ -33,19 +41,40 @@ public class Simulator extends Thread {
 	// public IQueue jobended = new Queue(0);
 
 	public IQueue jobended = new FIFO();
+	
+	public Statistiche stat;
+	private HPSsim owner;
 
 	public Simulator(Hardware _hw, int _njobs, int _quantum, double _classificationRate, double _realTimeJobsProb, double _hjobrate, int _avgta, double _simTime) {
+		logger.setLevel(Level.INFO);
 
-		Simulator.tq = _quantum;
+		tq = _quantum;
 		this.njobs = _njobs;
 		this.classificationRate = _classificationRate;
 		this.realTimeJobsProb = _realTimeJobsProb;
 		this.hjobrate = _hjobrate;
 		this.hw = _hw;
 		this.avgta = _avgta;
-		
-		time_sim = _simTime;
 
+		time_sim = _simTime;
+		
+	}
+
+	public Simulator(hpssim.scheduler.Configurator conf, HPSsim hpSsim) {
+		tq = conf.qt;
+		this.njobs = conf.njobs;
+		this.classificationRate = conf.classificationRate;
+		this.realTimeJobsProb = conf.realTimeJobsProb;
+		this.hjobrate = conf.realTimeJobsProb;
+		this.hw = conf.hw;
+		this.avgta = conf.avgta;
+
+		time_sim = conf.simTime;
+		
+		stat = new Statistiche(conf);
+		owner = hpSsim;
+		init();
+		start();
 	}
 
 	public IQueue getJobsEnded() {
@@ -138,24 +167,28 @@ public class Simulator extends Thread {
 			}
 
 			job.printJob();
-			
-			if(hw.getNumGPU()==0)
+
+			if (hw.getNumGPU() == 0)
 				job.setClassification(0);
-			
+
 			if (job.classification == 0)
 				cpujobs++;
 			else
 				gpujobs++;
 			Event ev = new Event(job, Event.ENQUEUE, job.timeArrival);
 			events.insertEvent(ev);
+			
+			stat.getListaJob().add(job);
 		}
-		System.out.println("RT " + rtjobs + " - User " + ujobs);
-		System.out.println("CPU " + cpujobs + " - GPU " + gpujobs);
-		// System.out.println(realTimeJobsProb);
+		if (infoLog)
+			System.out.println("RT " + rtjobs + " - User " + ujobs);
+		if (infoLog)
+			System.out.println("CPU " + cpujobs + " - GPU " + gpujobs);
+		// if(infoLog) System.out.println(realTimeJobsProb);
 		hw.infosystem();
 		System.out.println("done");
 
-//		scheduler = new HPSSimScheduler(FIFO.class);
+		// scheduler = new HPSSimScheduler(FIFO.class);
 		scheduler = new CompletelyFairScheduler(hw, events);
 	}
 
@@ -167,48 +200,63 @@ public class Simulator extends Thread {
 
 			switch (ev.type) {
 			case Event.ENQUEUE:
-				System.out.print("ENQUEUE " + ev.time + " ");
+				if (infoLog)
+					System.out.print("ENQUEUE " + ev.time + " ");
 				// call scheduler to rearrange start time
 				// Insert a Job in Queue
 				// scheduler.schedule(events, ev, dev, q);
 				EventWorkFlow.enqueue(scheduler, events, ev, hw);
-				System.out.print("Queue | ");
-				scheduler.printjob();
+				if (infoLog)
+					System.out.print("Queue | ");
+				if (infoLog)
+					scheduler.printjob();
 				break;
 			case Event.RUN:
-				System.out.print("RUN " + ev.time + " ");
+				if (infoLog)
+					System.out.print("RUN " + ev.time + " ");
 				EventWorkFlow.run(scheduler, events, ev, hw);
-				System.out.print("Queue | ");
-				scheduler.printjob();
+				if (infoLog)
+					System.out.print("Queue | ");
+				if (infoLog)
+					scheduler.printjob();
 				break;
 			case Event.RESCHEDULE: // each RESCHEDULE events has job = null
 				// rearrange priority on queued jobs and set next run job
 				// call scheduler
-				System.out.print("RESCHEDULE " + ev.time + " ");
+				if (infoLog)
+					System.out.print("RESCHEDULE " + ev.time + " ");
 				EventWorkFlow.reschedule(scheduler, events, ev, hw);
-				System.out.print("Queue | ");
-				scheduler.printjob();
+				if (infoLog)
+					System.out.print("Queue | ");
+				if (infoLog)
+					scheduler.printjob();
 				break;
 			case Event.FINALIZE:
 				// deallocate device and recall scheduling procedure
 				// free device
-				System.out.print("FINALIZE " + ev.time + " ");
+				if (infoLog)
+					System.out.print("FINALIZE " + ev.time + " ");
 				EventWorkFlow.finalize(scheduler, events, ev, hw, jobended);
 				break;
 			case Event.REQUEUE:
 				// Add old Job in queue set reschelude attrib for job ++
-				System.out.print("REQUEUE " + ev.time + " ");
-				EventWorkFlow.requeue(scheduler, events, ev, hw);
-				System.out.print("Queue | ");
-				scheduler.printjob();
+				if (infoLog)
+					System.out.print("REQUEUE " + ev.time + " ");
+				EventWorkFlow.requeue(scheduler, events, ev, hw, tq);
+				if (infoLog)
+					System.out.print("Queue | ");
+				if (infoLog)
+					scheduler.printjob();
 				break;
 			case Event.NULL:
 				/* NOT used */
 				break;
 			}
 
-			System.out.println();
-			System.out.println("----------------------------------------");
+			if (infoLog)
+				System.out.println("");
+			if (infoLog)
+				System.out.println("----------------------------------------");
 
 			return ev;
 		} catch (Exception e) {
@@ -222,9 +270,12 @@ public class Simulator extends Thread {
 	}
 
 	public void run() {
+		
 		try {
-			init();
-			simulate();
+			if(!run)
+				wait();
+			else
+				simulate();
 		} catch (Exception e) {
 			e.printStackTrace();
 			new RuntimeException(e);
@@ -232,36 +283,54 @@ public class Simulator extends Thread {
 	}
 
 	public void simulate() throws Exception {
-		System.out.println("Start simulation...");
-		System.out.println("Current Event - Ta - Next Event Generate - Ta - Device Status - Queue Size | Queue");
+		if (infoLog)
+			System.out.println("Start simulation...");
+		
+		long test = System.currentTimeMillis();
+		
+		if (infoLog)
+			System.out.println("Current Event - Ta - Next Event Generate - Ta - Device Status - Queue Size | Queue");
 		int lastEvTime = 0;
 		int i = 0;
-		
-		
-		synchronized (events) {
-			while (run && lastEvTime < (time_sim) && (!events.list.isEmpty())) {
-				
-				wait();
-				
+
+//		synchronized (events) {
+			while (run) {
+				Thread.sleep(10);
+
 				Event ev = clock();
 				lastEvTime = ev.time;
+				
+				stat.setLastExeTime(lastEvTime);
+				
+				stat.setProcessiNelSistema(scheduler.size());
+				
+				owner.datasetCPU.setValue(stat.getCpuLoad());
+				owner.virtualTime.setText(""+stat.getLastExeTime());
+				owner.processiElaborazione.setText(""+stat.getProcessiInElaborazione());
+				owner.processiInCoda.setText(""+stat.getProcessiInCoda());
+				owner.processiNelSistema.setText(""+stat.getProcessiNelSistema());
+				
+				
 				// printProgBar((int) (lastEvTime / time_sim * 100));
-
-				// this.wait(1);
-
 				i++;
+				if(lastEvTime > (time_sim) || (events.list.isEmpty()))
+					run = false;
 			}
-		}
-		
+//		}
 
-		notify();
-		
 		// q.printpriority();
 		// jobended.printjob();
-		System.out.println("");
-		jobended.printJobsStat();
-		System.out.println("");
-		System.out.println(i);
+		if (infoLog)
+			System.out.println("");
+		if (infoLog)
+			jobended.printJobsStat();
+		if (infoLog)
+			System.out.println("");
+		if (infoLog)
+			System.out.println("" + i);
+		if (infoLog)
+			System.out.println("Tempo di esecuzione :" + (System.currentTimeMillis() - test));
+		
 	}
 
 	public void printProgBar(int percent) {

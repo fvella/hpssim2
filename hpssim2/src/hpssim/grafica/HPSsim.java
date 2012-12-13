@@ -9,6 +9,7 @@ import javax.swing.*;
 import javax.swing.table.*;
 
 import hpssim.hardware.Hardware;
+import hpssim.scheduler.Configurator;
 import hpssim.simulator.Simulator;
 import info.clearthought.layout.TableLayout;
 import info.clearthought.layout.TableLayoutConstraints;
@@ -36,9 +37,11 @@ import javax.swing.JProgressBar;
 import javax.swing.JSlider;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.TableModelListener;
 
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -51,7 +54,7 @@ import org.jfree.data.general.ValueDataset;
 import com.jgoodies.forms.factories.DefaultComponentFactory;
 
 /**
- * @author Marco delle lande
+ * @author 
  */
 public class HPSsim {
 
@@ -61,6 +64,7 @@ public class HPSsim {
 		initComponents();
 		setMeter();
 		hpssimWindow.setVisible(true);
+		sim = null;
 	}
 
 	private void resetButtonActionPerformed(ActionEvent e) {
@@ -88,41 +92,36 @@ public class HPSsim {
 	}
 
 	private void okButtonActionPerformed(ActionEvent e) {
+		try {
 
-		long test = System.currentTimeMillis();
+			int njobs = Integer.parseInt((new String(textFieldNjob.getText())).trim());
+			int simTime = Integer.parseInt((new String(textFieldSimTime.getText())).replace("ms", "").trim());
+			// il tempo cpu che può spendere il processo
+			Integer qt = Integer.parseInt((new String(textFieldTimeSlice.getText())).trim());
+			double classificationRate = sliderclassRate.getValue() / 100;
+			double realTimeJobsProb = (Double.valueOf(sliderRTJob.getValue())) / 100;
+			double percentOpenCLjob = (Double.valueOf(sliderOpenCl.getValue())) / 100;
+			int avgta = Integer.parseInt(textFieldQVGA.getText().trim());
 
-		int njobs = Integer.getInteger(textFieldNjob.getText());
-		double simTime = Double.valueOf(textFieldSimTime.getText());
+			Hardware hw = new Hardware(Integer.parseInt(ncpu.getText()), Integer.parseInt(ngpu.getText()));
+			Configurator conf = new Configurator(hw, njobs, qt.intValue(), classificationRate, realTimeJobsProb, percentOpenCLjob, avgta, simTime);
+			sim = new Simulator(conf, this);
 
-		// il tempo cpu che può spendere il processo
-		Integer qt = Integer.getInteger(textFieldTimeSlice.getText());
+			synchronized (sim) {
+				((Simulator) sim).run = true;
+				sim.notify();
+			}
 
-		double classificationRate = 0.95D;
-
-		double realTimeJobsProb = (Double.valueOf(sliderRTJob.getValue())) / 100;
-		double percentOpenCLjob = (Double.valueOf(sliderOpenCl.getValue())) / 100;
-		;
-		int avgta = Integer.getInteger(textFieldQVGA.getText());
-
-		Hardware hw = new Hardware(Integer.getInteger(ncpu.getText()), Integer.getInteger(ngpu.getText()));
-
-		sim = new Simulator(hw, njobs, qt, classificationRate, realTimeJobsProb, percentOpenCLjob, avgta, simTime);
-		
-		sim.run();
-		
-		
-		
-
-		System.out.println(System.currentTimeMillis() - test);
+		} catch (Exception e2) {
+			e2.printStackTrace();
+			erroreLabel.setText(e2.getMessage());
+			dialog1.setVisible(true);
+		}
 
 	}
 
 	private void sliderJobStateChanged(ChangeEvent e) {
 		textFieldNjob.setText(String.valueOf(sliderJob.getValue()));
-	}
-
-	public JTable getTableProcess() {
-		return tableProcess;
 	}
 
 	private void sliderSimulationTimeStateChanged(ChangeEvent e) {
@@ -151,10 +150,23 @@ public class HPSsim {
 		}
 	}
 
+	private void button2ActionPerformed(ActionEvent e) {
+		dialog1.setVisible(false);
+	}
+
+	private void button1ActionPerformed(ActionEvent e) {
+		if (sim != null) {
+			synchronized (sim) {
+				((Simulator) sim).run = false;
+				sim.notify();
+			}
+		}
+	}
+
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY
 		// //GEN-BEGIN:initComponents
-		// Generated using JFormDesigner Evaluation license - Marco delle lande
+		// Generated using JFormDesigner Evaluation license - 
 		DefaultComponentFactory compFactory = DefaultComponentFactory.getInstance();
 		HPSsimWindow = new JFrame();
 		hpssimWindow = new JPanel();
@@ -190,12 +202,8 @@ public class HPSsim {
 		label21 = new JLabel();
 		sliderclassRate = new JSlider();
 		labelclassRate = new JLabel();
+		vSpacer2 = new JPanel(null);
 		resetButton = new JButton();
-		panelProcesses = new JPanel();
-		scrollPane1 = new JScrollPane();
-		tableProcess = new JTable();
-		panelGraph = new JPanel();
-		graphPanel = new JPanel();
 		panelPerformance = new JPanel();
 		panelCPU = new JPanel();
 		panelGPU = new JPanel();
@@ -213,81 +221,86 @@ public class HPSsim {
 		mediaUsoGPU = new JTextField();
 		label16 = new JLabel();
 		processiInCoda = new JTextField();
+		panelGraph = new JPanel();
+		graphPanel = new JPanel();
 		title1 = compFactory.createTitle("HPSsim 2.0 ");
-		okButton = new JButton();
 		button1 = new JButton();
+		okButton = new JButton();
 		spinner1 = new JSpinner();
+		dialog1 = new JDialog();
+		button2 = new JButton();
+		label13 = new JLabel();
+		erroreLabel = new JLabel();
 
-		// ======== HPSsimWindow ========
+		//======== HPSsimWindow ========
 		{
 			HPSsimWindow.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+			HPSsimWindow.setResizable(false);
 			Container HPSsimWindowContentPane = HPSsimWindow.getContentPane();
 
-			// ======== hpssimWindow ========
+			//======== hpssimWindow ========
 			{
 				hpssimWindow.setForeground(Color.blue);
 
 				// JFormDesigner evaluation mark
-				hpssimWindow.setBorder(new javax.swing.border.CompoundBorder(new javax.swing.border.TitledBorder(new javax.swing.border.EmptyBorder(0, 0, 0, 0), "JFormDesigner Evaluation",
-						javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.BOTTOM, new java.awt.Font("Dialog", java.awt.Font.BOLD, 12), java.awt.Color.red), hpssimWindow
-						.getBorder()));
-				hpssimWindow.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-					public void propertyChange(java.beans.PropertyChangeEvent e) {
-						if ("border".equals(e.getPropertyName()))
-							throw new RuntimeException();
-					}
-				});
+				hpssimWindow.setBorder(new javax.swing.border.CompoundBorder(
+					new javax.swing.border.TitledBorder(new javax.swing.border.EmptyBorder(0, 0, 0, 0),
+						"", javax.swing.border.TitledBorder.CENTER,
+						javax.swing.border.TitledBorder.BOTTOM, new java.awt.Font("Dialog", java.awt.Font.BOLD, 12),
+						java.awt.Color.red), hpssimWindow.getBorder())); hpssimWindow.addPropertyChangeListener(new java.beans.PropertyChangeListener(){public void propertyChange(java.beans.PropertyChangeEvent e){if("border".equals(e.getPropertyName()))throw new RuntimeException();}});
 
 				hpssimWindow.setLayout(null);
 
-				// ======== hpssimTab ========
+				//======== hpssimTab ========
 				{
 
-					// ======== panelConfiguration ========
+					//======== panelConfiguration ========
 					{
-						panelConfiguration.setLayout(new TableLayout(new double[][] { { 1, 70, 70, 70, 68, 70, 70, 74 },
-								{ 0.01, 27, 21, 26, 27, 25, 25, 25, 21, 21, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED } }));
-						((TableLayout) panelConfiguration.getLayout()).setHGap(5);
-						((TableLayout) panelConfiguration.getLayout()).setVGap(5);
+						panelConfiguration.setLayout(new TableLayout(new double[][] {
+							{1, 70, 70, 70, 68, 70, 70, 74},
+							{0.01, 27, 21, 26, 27, 25, 25, 25, 21, 21, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, 22, TableLayout.PREFERRED}}));
+						((TableLayout)panelConfiguration.getLayout()).setHGap(5);
+						((TableLayout)panelConfiguration.getLayout()).setVGap(5);
 
-						// ---- label10 ----
+						//---- label10 ----
 						label10.setText("Hardware");
 						label10.setFont(new Font("Segoe UI", Font.ITALIC, 16));
 						panelConfiguration.add(label10, new TableLayoutConstraints(1, 1, 7, 1, TableLayoutConstraints.CENTER, TableLayoutConstraints.FULL));
 
-						// ---- label3 ----
+						//---- label3 ----
 						label3.setText("CPU");
 						label3.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 						label3.setLabelFor(ncpu);
 						panelConfiguration.add(label3, new TableLayoutConstraints(1, 2, 1, 2, TableLayoutConstraints.RIGHT, TableLayoutConstraints.FULL));
 
-						// ---- ncpu ----
+						//---- ncpu ----
 						ncpu.setText("0");
 						panelConfiguration.add(ncpu, new TableLayoutConstraints(2, 2, 3, 2, TableLayoutConstraints.FULL, TableLayoutConstraints.FULL));
 
-						// ---- label4 ----
+						//---- label4 ----
 						label4.setText("GPU");
 						label4.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 						label4.setLabelFor(ngpu);
 						panelConfiguration.add(label4, new TableLayoutConstraints(4, 2, 4, 2, TableLayoutConstraints.RIGHT, TableLayoutConstraints.FULL));
 
-						// ---- ngpu ----
+						//---- ngpu ----
 						ngpu.setText("0");
 						panelConfiguration.add(ngpu, new TableLayoutConstraints(5, 2, 6, 2, TableLayoutConstraints.FULL, TableLayoutConstraints.FULL));
 						panelConfiguration.add(vSpacer1, new TableLayoutConstraints(1, 3, 7, 3, TableLayoutConstraints.FULL, TableLayoutConstraints.FULL));
 
-						// ---- label11 ----
+						//---- label11 ----
 						label11.setText("Simulation");
 						label11.setFont(new Font("Segoe UI", Font.ITALIC, 16));
 						panelConfiguration.add(label11, new TableLayoutConstraints(1, 4, 7, 4, TableLayoutConstraints.CENTER, TableLayoutConstraints.FULL));
 
-						// ---- label2 ----
+						//---- label2 ----
 						label2.setText("Sim Time");
 						panelConfiguration.add(label2, new TableLayoutConstraints(1, 5, 1, 5, TableLayoutConstraints.RIGHT, TableLayoutConstraints.FULL));
 
-						// ---- sliderSimulationTime ----
+						//---- sliderSimulationTime ----
 						sliderSimulationTime.setValue(0);
-						sliderSimulationTime.setMaximum(10000);
+						sliderSimulationTime.setMaximum(100000000);
+						sliderSimulationTime.setMinimum(10000);
 						sliderSimulationTime.addChangeListener(new ChangeListener() {
 							@Override
 							public void stateChanged(ChangeEvent e) {
@@ -296,15 +309,15 @@ public class HPSsim {
 						});
 						panelConfiguration.add(sliderSimulationTime, new TableLayoutConstraints(2, 5, 6, 5, TableLayoutConstraints.FULL, TableLayoutConstraints.FULL));
 
-						// ---- textFieldSimTime ----
-						textFieldSimTime.setText("0 ms");
+						//---- textFieldSimTime ----
+						textFieldSimTime.setText("10000 ms");
 						panelConfiguration.add(textFieldSimTime, new TableLayoutConstraints(7, 5, 7, 5, TableLayoutConstraints.FULL, TableLayoutConstraints.FULL));
 
-						// ---- label1 ----
+						//---- label1 ----
 						label1.setText("Numero di job");
 						panelConfiguration.add(label1, new TableLayoutConstraints(1, 6, 1, 6, TableLayoutConstraints.RIGHT, TableLayoutConstraints.CENTER));
 
-						// ---- sliderJob ----
+						//---- sliderJob ----
 						sliderJob.setValue(0);
 						sliderJob.setMaximum(1000);
 						sliderJob.addChangeListener(new ChangeListener() {
@@ -315,21 +328,27 @@ public class HPSsim {
 						});
 						panelConfiguration.add(sliderJob, new TableLayoutConstraints(2, 6, 4, 6, TableLayoutConstraints.FULL, TableLayoutConstraints.FULL));
 
-						// ---- textFieldNjob ----
+						//---- textFieldNjob ----
 						textFieldNjob.setText("0");
 						panelConfiguration.add(textFieldNjob, new TableLayoutConstraints(5, 6, 5, 6, TableLayoutConstraints.FULL, TableLayoutConstraints.FULL));
 
-						// ---- label9 ----
+						//---- label9 ----
 						label9.setText("Media arrivo");
 						panelConfiguration.add(label9, new TableLayoutConstraints(6, 6, 6, 6, TableLayoutConstraints.RIGHT, TableLayoutConstraints.FULL));
+
+						//---- textFieldQVGA ----
+						textFieldQVGA.setText("0");
 						panelConfiguration.add(textFieldQVGA, new TableLayoutConstraints(7, 6, 7, 6, TableLayoutConstraints.FULL, TableLayoutConstraints.FULL));
 
-						// ---- label6 ----
+						//---- label6 ----
 						label6.setText("Scheduler");
 						panelConfiguration.add(label6, new TableLayoutConstraints(1, 8, 1, 8, TableLayoutConstraints.RIGHT, TableLayoutConstraints.FULL));
 
-						// ---- comboBoxScheduler ----
-						comboBoxScheduler.setModel(new DefaultComboBoxModel<>(new String[] { "Priority Round Robin", "Completely Fair Scheduler" }));
+						//---- comboBoxScheduler ----
+						comboBoxScheduler.setModel(new DefaultComboBoxModel<>(new String[] {
+							"Priority Round Robin",
+							"Completely Fair Scheduler"
+						}));
 						comboBoxScheduler.addActionListener(new ActionListener() {
 							@Override
 							public void actionPerformed(ActionEvent e) {
@@ -338,24 +357,33 @@ public class HPSsim {
 						});
 						panelConfiguration.add(comboBoxScheduler, new TableLayoutConstraints(2, 8, 5, 8, TableLayoutConstraints.FULL, TableLayoutConstraints.FULL));
 
-						// ---- label8 ----
+						//---- label8 ----
 						label8.setText("Time Slice");
 						panelConfiguration.add(label8, new TableLayoutConstraints(6, 8, 6, 8, TableLayoutConstraints.RIGHT, TableLayoutConstraints.FULL));
+
+						//---- textFieldTimeSlice ----
+						textFieldTimeSlice.setText("0");
 						panelConfiguration.add(textFieldTimeSlice, new TableLayoutConstraints(7, 8, 7, 8, TableLayoutConstraints.FULL, TableLayoutConstraints.FULL));
 
-						// ---- label7 ----
+						//---- label7 ----
 						label7.setText("Queue");
 						panelConfiguration.add(label7, new TableLayoutConstraints(1, 9, 1, 9, TableLayoutConstraints.RIGHT, TableLayoutConstraints.FULL));
 
-						// ---- comboBoxQueue ----
-						comboBoxQueue.setModel(new DefaultComboBoxModel<>(new String[] { "FIFO", "Highest Priority First", "Shortest Job First", "Round Robin", "Random Queue" }));
+						//---- comboBoxQueue ----
+						comboBoxQueue.setModel(new DefaultComboBoxModel<>(new String[] {
+							"FIFO",
+							"Highest Priority First",
+							"Shortest Job First",
+							"Round Robin",
+							"Random Queue"
+						}));
 						panelConfiguration.add(comboBoxQueue, new TableLayoutConstraints(2, 9, 5, 9, TableLayoutConstraints.FULL, TableLayoutConstraints.FULL));
 
-						// ---- label12 ----
+						//---- label12 ----
 						label12.setText("RT Job Prob");
 						panelConfiguration.add(label12, new TableLayoutConstraints(1, 11, 1, 11, TableLayoutConstraints.RIGHT, TableLayoutConstraints.FULL));
 
-						// ---- sliderRTJob ----
+						//---- sliderRTJob ----
 						sliderRTJob.setValue(0);
 						sliderRTJob.addChangeListener(new ChangeListener() {
 							@Override
@@ -365,15 +393,15 @@ public class HPSsim {
 						});
 						panelConfiguration.add(sliderRTJob, new TableLayoutConstraints(2, 11, 2, 11, TableLayoutConstraints.FULL, TableLayoutConstraints.FULL));
 
-						// ---- labelRT ----
+						//---- labelRT ----
 						labelRT.setText("0%");
 						panelConfiguration.add(labelRT, new TableLayoutConstraints(3, 11, 3, 11, TableLayoutConstraints.FULL, TableLayoutConstraints.FULL));
 
-						// ---- label14 ----
+						//---- label14 ----
 						label14.setText("OpenCL Job ");
 						panelConfiguration.add(label14, new TableLayoutConstraints(5, 11, 5, 11, TableLayoutConstraints.RIGHT, TableLayoutConstraints.FULL));
 
-						// ---- sliderOpenCl ----
+						//---- sliderOpenCl ----
 						sliderOpenCl.setValue(0);
 						sliderOpenCl.addChangeListener(new ChangeListener() {
 							@Override
@@ -383,15 +411,15 @@ public class HPSsim {
 						});
 						panelConfiguration.add(sliderOpenCl, new TableLayoutConstraints(6, 11, 6, 11, TableLayoutConstraints.FULL, TableLayoutConstraints.FULL));
 
-						// ---- labelOPENCL ----
+						//---- labelOPENCL ----
 						labelOPENCL.setText("0%");
 						panelConfiguration.add(labelOPENCL, new TableLayoutConstraints(7, 11, 7, 11, TableLayoutConstraints.FULL, TableLayoutConstraints.FULL));
 
-						// ---- label21 ----
+						//---- label21 ----
 						label21.setText("Class Rate");
-						panelConfiguration.add(label21, new TableLayoutConstraints(1, 13, 1, 13, TableLayoutConstraints.RIGHT, TableLayoutConstraints.FULL));
+						panelConfiguration.add(label21, new TableLayoutConstraints(1, 12, 1, 12, TableLayoutConstraints.RIGHT, TableLayoutConstraints.FULL));
 
-						// ---- sliderclassRate ----
+						//---- sliderclassRate ----
 						sliderclassRate.setValue(90);
 						sliderclassRate.addChangeListener(new ChangeListener() {
 							@Override
@@ -399,13 +427,14 @@ public class HPSsim {
 								sliderclassRateStateChanged(e);
 							}
 						});
-						panelConfiguration.add(sliderclassRate, new TableLayoutConstraints(2, 13, 4, 13, TableLayoutConstraints.FULL, TableLayoutConstraints.FULL));
+						panelConfiguration.add(sliderclassRate, new TableLayoutConstraints(2, 12, 4, 12, TableLayoutConstraints.FULL, TableLayoutConstraints.FULL));
 
-						// ---- labelclassRate ----
+						//---- labelclassRate ----
 						labelclassRate.setText("90%");
-						panelConfiguration.add(labelclassRate, new TableLayoutConstraints(5, 13, 5, 13, TableLayoutConstraints.FULL, TableLayoutConstraints.FULL));
+						panelConfiguration.add(labelclassRate, new TableLayoutConstraints(5, 12, 5, 12, TableLayoutConstraints.FULL, TableLayoutConstraints.FULL));
+						panelConfiguration.add(vSpacer2, new TableLayoutConstraints(1, 13, 7, 13, TableLayoutConstraints.FULL, TableLayoutConstraints.FULL));
 
-						// ---- resetButton ----
+						//---- resetButton ----
 						resetButton.setText("Reset");
 						resetButton.addActionListener(new ActionListener() {
 							@Override
@@ -415,150 +444,171 @@ public class HPSsim {
 								resetButtonActionPerformed(e);
 							}
 						});
-						panelConfiguration.add(resetButton, new TableLayoutConstraints(7, 13, 7, 13, TableLayoutConstraints.FULL, TableLayoutConstraints.FULL));
+						panelConfiguration.add(resetButton, new TableLayoutConstraints(7, 14, 7, 14, TableLayoutConstraints.FULL, TableLayoutConstraints.FULL));
 					}
 					hpssimTab.addTab("Configuration", panelConfiguration);
 
-					// ======== panelProcesses ========
-					{
-						panelProcesses.setLayout(new GridLayout());
 
-						// ======== scrollPane1 ========
-						{
-
-							// ---- tableProcess ----
-							tableProcess.setModel(new DefaultTableModel(new Object[][] { { null, null, null, "", null, null }, { null, null, null, null, null, null }, }, new String[] { "Name",
-									"Time Arrival", "Classification", "Nice", "Type", "Remaing Time" }));
-							scrollPane1.setViewportView(tableProcess);
-						}
-						panelProcesses.add(scrollPane1);
-					}
-					hpssimTab.addTab("Processes", panelProcesses);
-
-					// ======== panelGraph ========
+					//======== panelPerformance ========
 					{
 
-						// ======== graphPanel ========
-						{
-							graphPanel.setLayout(new BorderLayout());
-						}
-
-						GroupLayout panelGraphLayout = new GroupLayout(panelGraph);
-						panelGraph.setLayout(panelGraphLayout);
-						panelGraphLayout.setHorizontalGroup(panelGraphLayout.createParallelGroup().addGroup(
-								panelGraphLayout.createSequentialGroup().addContainerGap().addComponent(graphPanel, GroupLayout.DEFAULT_SIZE, 520, Short.MAX_VALUE).addContainerGap()));
-						panelGraphLayout.setVerticalGroup(panelGraphLayout.createParallelGroup().addGroup(
-								panelGraphLayout.createSequentialGroup().addContainerGap().addComponent(graphPanel, GroupLayout.DEFAULT_SIZE, 390, Short.MAX_VALUE).addContainerGap()));
-					}
-					hpssimTab.addTab("Graph", panelGraph);
-
-					// ======== panelPerformance ========
-					{
-
-						// ======== panelCPU ========
+						//======== panelCPU ========
 						{
 							panelCPU.setLayout(new BorderLayout());
 						}
 
-						// ======== panelGPU ========
+						//======== panelGPU ========
 						{
 							panelGPU.setLayout(new BorderLayout());
 						}
 
-						// ======== panel1 ========
+						//======== panel1 ========
 						{
 							panel1.setLayout(new TableLayout(new double[][] {
-									{ TableLayout.PREFERRED, 114, 72, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, 114, 72 },
-									{ TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED } }));
-							((TableLayout) panel1.getLayout()).setHGap(5);
-							((TableLayout) panel1.getLayout()).setVGap(5);
+								{TableLayout.PREFERRED, 114, 72, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, 114, 72},
+								{TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED}}));
+							((TableLayout)panel1.getLayout()).setHGap(5);
+							((TableLayout)panel1.getLayout()).setVGap(5);
 
-							// ---- label18 ----
+							//---- label18 ----
 							label18.setText("Virtual Time");
 							panel1.add(label18, new TableLayoutConstraints(1, 0, 1, 0, TableLayoutConstraints.FULL, TableLayoutConstraints.FULL));
 							panel1.add(virtualTime, new TableLayoutConstraints(2, 0, 2, 0, TableLayoutConstraints.FULL, TableLayoutConstraints.FULL));
 
-							// ---- label5 ----
+							//---- label5 ----
 							label5.setText("Processi nel sistema");
 							panel1.add(label5, new TableLayoutConstraints(1, 2, 1, 2, TableLayoutConstraints.FULL, TableLayoutConstraints.FULL));
 
-							// ---- processiNelSistema ----
+							//---- processiNelSistema ----
 							processiNelSistema.setText("0");
 							panel1.add(processiNelSistema, new TableLayoutConstraints(2, 2, 2, 2, TableLayoutConstraints.FULL, TableLayoutConstraints.FULL));
 
-							// ---- label19 ----
+							//---- label19 ----
 							label19.setText("Media Utilizzo CPU");
 							panel1.add(label19, new TableLayoutConstraints(7, 2, 7, 2, TableLayoutConstraints.FULL, TableLayoutConstraints.FULL));
 
-							// ---- mediaUsoCPU ----
+							//---- mediaUsoCPU ----
 							mediaUsoCPU.setText("0");
 							panel1.add(mediaUsoCPU, new TableLayoutConstraints(8, 2, 8, 2, TableLayoutConstraints.FULL, TableLayoutConstraints.FULL));
 
-							// ---- label17 ----
+							//---- label17 ----
 							label17.setText("Processi in elaborazione");
 							panel1.add(label17, new TableLayoutConstraints(1, 3, 1, 3, TableLayoutConstraints.FULL, TableLayoutConstraints.FULL));
 
-							// ---- processiElaborazione ----
+							//---- processiElaborazione ----
 							processiElaborazione.setText("0");
 							panel1.add(processiElaborazione, new TableLayoutConstraints(2, 3, 2, 3, TableLayoutConstraints.FULL, TableLayoutConstraints.FULL));
 
-							// ---- label20 ----
+							//---- label20 ----
 							label20.setText("Media Utilizzo GPU");
 							panel1.add(label20, new TableLayoutConstraints(7, 3, 7, 3, TableLayoutConstraints.FULL, TableLayoutConstraints.FULL));
 
-							// ---- mediaUsoGPU ----
+							//---- mediaUsoGPU ----
 							mediaUsoGPU.setText("0");
 							panel1.add(mediaUsoGPU, new TableLayoutConstraints(8, 3, 8, 3, TableLayoutConstraints.FULL, TableLayoutConstraints.FULL));
 
-							// ---- label16 ----
+							//---- label16 ----
 							label16.setText("Processi in coda");
 							panel1.add(label16, new TableLayoutConstraints(1, 4, 1, 4, TableLayoutConstraints.FULL, TableLayoutConstraints.FULL));
 
-							// ---- processiInCoda ----
+							//---- processiInCoda ----
 							processiInCoda.setText("0");
 							panel1.add(processiInCoda, new TableLayoutConstraints(2, 4, 2, 4, TableLayoutConstraints.FULL, TableLayoutConstraints.FULL));
 						}
 
 						GroupLayout panelPerformanceLayout = new GroupLayout(panelPerformance);
 						panelPerformance.setLayout(panelPerformanceLayout);
-						panelPerformanceLayout.setHorizontalGroup(panelPerformanceLayout.createParallelGroup().addGroup(
-								panelPerformanceLayout
-										.createSequentialGroup()
-										.addContainerGap()
-										.addGroup(
-												panelPerformanceLayout
-														.createParallelGroup()
-														.addGroup(
-																panelPerformanceLayout.createSequentialGroup().addComponent(panelCPU, GroupLayout.PREFERRED_SIZE, 241, GroupLayout.PREFERRED_SIZE)
-																		.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-																		.addComponent(panelGPU, GroupLayout.PREFERRED_SIZE, 241, GroupLayout.PREFERRED_SIZE))
-														.addComponent(panel1, GroupLayout.DEFAULT_SIZE, 520, Short.MAX_VALUE).addComponent(separator1, GroupLayout.Alignment.TRAILING))
-										.addContainerGap()));
-						panelPerformanceLayout.setVerticalGroup(panelPerformanceLayout.createParallelGroup().addGroup(
-								panelPerformanceLayout
-										.createSequentialGroup()
-										.addGap(38, 38, 38)
-										.addGroup(
-												panelPerformanceLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-														.addComponent(panelCPU, GroupLayout.PREFERRED_SIZE, 205, GroupLayout.PREFERRED_SIZE)
-														.addComponent(panelGPU, GroupLayout.PREFERRED_SIZE, 205, GroupLayout.PREFERRED_SIZE)).addGap(18, 18, 18)
-										.addComponent(separator1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-										.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).addComponent(panel1, GroupLayout.DEFAULT_SIZE, 132, Short.MAX_VALUE).addContainerGap()));
+						panelPerformanceLayout.setHorizontalGroup(
+							panelPerformanceLayout.createParallelGroup()
+								.addGroup(panelPerformanceLayout.createSequentialGroup()
+									.addContainerGap()
+									.addGroup(panelPerformanceLayout.createParallelGroup()
+										.addGroup(panelPerformanceLayout.createSequentialGroup()
+											.addComponent(panelCPU, GroupLayout.PREFERRED_SIZE, 241, GroupLayout.PREFERRED_SIZE)
+											.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+											.addComponent(panelGPU, GroupLayout.PREFERRED_SIZE, 241, GroupLayout.PREFERRED_SIZE))
+										.addComponent(panel1, GroupLayout.DEFAULT_SIZE, 520, Short.MAX_VALUE)
+										.addComponent(separator1, GroupLayout.Alignment.TRAILING))
+									.addContainerGap())
+						);
+						panelPerformanceLayout.setVerticalGroup(
+							panelPerformanceLayout.createParallelGroup()
+								.addGroup(panelPerformanceLayout.createSequentialGroup()
+									.addGap(38, 38, 38)
+									.addGroup(panelPerformanceLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+										.addComponent(panelCPU, GroupLayout.PREFERRED_SIZE, 205, GroupLayout.PREFERRED_SIZE)
+										.addComponent(panelGPU, GroupLayout.PREFERRED_SIZE, 205, GroupLayout.PREFERRED_SIZE))
+									.addGap(18, 18, 18)
+									.addComponent(separator1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+									.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+									.addComponent(panel1, GroupLayout.DEFAULT_SIZE, 142, Short.MAX_VALUE)
+									.addContainerGap())
+						);
 					}
 					hpssimTab.addTab("Performance", panelPerformance);
 
+
+					//======== panelGraph ========
+					{
+
+						//======== graphPanel ========
+						{
+							graphPanel.setLayout(new BorderLayout());
+						}
+
+						GroupLayout panelGraphLayout = new GroupLayout(panelGraph);
+						panelGraph.setLayout(panelGraphLayout);
+						panelGraphLayout.setHorizontalGroup(
+							panelGraphLayout.createParallelGroup()
+								.addGroup(panelGraphLayout.createSequentialGroup()
+									.addContainerGap()
+									.addComponent(graphPanel, GroupLayout.DEFAULT_SIZE, 520, Short.MAX_VALUE)
+									.addContainerGap())
+						);
+						panelGraphLayout.setVerticalGroup(
+							panelGraphLayout.createParallelGroup()
+								.addGroup(panelGraphLayout.createSequentialGroup()
+									.addContainerGap()
+									.addComponent(graphPanel, GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+									.addContainerGap())
+						);
+					}
+					hpssimTab.addTab("Graph", panelGraph);
+
 				}
 				hpssimWindow.add(hpssimTab);
-				hpssimTab.setBounds(10, 40, 545, 440);
+				hpssimTab.setBounds(10, 40, 545, 450);
 
-				// ---- title1 ----
+				//---- title1 ----
 				title1.setFont(title1.getFont().deriveFont(title1.getFont().getSize() + 8f));
 				hpssimWindow.add(title1);
 				title1.setBounds(10, 11, 132, title1.getPreferredSize().height);
 
+				//---- button1 ----
+				button1.setText("Stop");
+				button1.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						button1ActionPerformed(e);
+					}
+				});
+				hpssimWindow.add(button1);
+				button1.setBounds(385, 495, 74, button1.getPreferredSize().height);
+
+				//---- okButton ----
+				okButton.setText("Start");
+				okButton.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						okButtonActionPerformed(e);
+					}
+				});
+				hpssimWindow.add(okButton);
+				okButton.setBounds(470, 495, 74, okButton.getPreferredSize().height);
+
 				{ // compute preferred size
 					Dimension preferredSize = new Dimension();
-					for (int i = 0; i < hpssimWindow.getComponentCount(); i++) {
+					for(int i = 0; i < hpssimWindow.getComponentCount(); i++) {
 						Rectangle bounds = hpssimWindow.getComponent(i).getBounds();
 						preferredSize.width = Math.max(bounds.x + bounds.width, preferredSize.width);
 						preferredSize.height = Math.max(bounds.y + bounds.height, preferredSize.height);
@@ -571,46 +621,74 @@ public class HPSsim {
 				}
 			}
 
-			// ---- okButton ----
-			okButton.setText("Start");
-			okButton.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					okButtonActionPerformed(e);
-					okButtonActionPerformed(e);
-				}
-			});
-
-			// ---- button1 ----
-			button1.setText("Stop");
-
 			GroupLayout HPSsimWindowContentPaneLayout = new GroupLayout(HPSsimWindowContentPane);
 			HPSsimWindowContentPane.setLayout(HPSsimWindowContentPaneLayout);
-			HPSsimWindowContentPaneLayout
-					.setHorizontalGroup(HPSsimWindowContentPaneLayout
-							.createParallelGroup()
-							.addGroup(
-									GroupLayout.Alignment.TRAILING,
-									HPSsimWindowContentPaneLayout.createSequentialGroup().addGap(0, 0, Short.MAX_VALUE)
-											.addComponent(hpssimWindow, GroupLayout.PREFERRED_SIZE, 565, GroupLayout.PREFERRED_SIZE))
-							.addGroup(
-									GroupLayout.Alignment.TRAILING,
-									HPSsimWindowContentPaneLayout.createSequentialGroup().addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-											.addComponent(button1, GroupLayout.PREFERRED_SIZE, 74, GroupLayout.PREFERRED_SIZE).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-											.addComponent(okButton, GroupLayout.PREFERRED_SIZE, 74, GroupLayout.PREFERRED_SIZE).addGap(21, 21, 21)));
-			HPSsimWindowContentPaneLayout.setVerticalGroup(HPSsimWindowContentPaneLayout.createParallelGroup().addGroup(
-					HPSsimWindowContentPaneLayout.createSequentialGroup().addComponent(hpssimWindow, GroupLayout.PREFERRED_SIZE, 485, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-							.addGroup(HPSsimWindowContentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE).addComponent(okButton).addComponent(button1)).addGap(0, 10, Short.MAX_VALUE)));
+			HPSsimWindowContentPaneLayout.setHorizontalGroup(
+				HPSsimWindowContentPaneLayout.createParallelGroup()
+					.addGroup(HPSsimWindowContentPaneLayout.createSequentialGroup()
+						.addComponent(hpssimWindow, GroupLayout.PREFERRED_SIZE, 565, GroupLayout.PREFERRED_SIZE)
+						.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+			);
+			HPSsimWindowContentPaneLayout.setVerticalGroup(
+				HPSsimWindowContentPaneLayout.createParallelGroup()
+					.addGroup(HPSsimWindowContentPaneLayout.createSequentialGroup()
+						.addComponent(hpssimWindow, GroupLayout.PREFERRED_SIZE, 528, GroupLayout.PREFERRED_SIZE)
+						.addGap(0, 1, Short.MAX_VALUE))
+			);
 			HPSsimWindow.pack();
 			HPSsimWindow.setLocationRelativeTo(HPSsimWindow.getOwner());
 		}
-		// JFormDesigner - End of component initialization
+
+		//======== dialog1 ========
+		{
+			dialog1.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+			Container dialog1ContentPane = dialog1.getContentPane();
+
+			//---- button2 ----
+			button2.setText("ok");
+			button2.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					button2ActionPerformed(e);
+				}
+			});
+
+			//---- label13 ----
+			label13.setText("Attenzione!");
+
+			GroupLayout dialog1ContentPaneLayout = new GroupLayout(dialog1ContentPane);
+			dialog1ContentPane.setLayout(dialog1ContentPaneLayout);
+			dialog1ContentPaneLayout.setHorizontalGroup(
+				dialog1ContentPaneLayout.createParallelGroup()
+					.addGroup(dialog1ContentPaneLayout.createSequentialGroup()
+						.addContainerGap()
+						.addGroup(dialog1ContentPaneLayout.createParallelGroup()
+							.addComponent(label13, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 249, Short.MAX_VALUE)
+							.addGroup(GroupLayout.Alignment.TRAILING, dialog1ContentPaneLayout.createSequentialGroup()
+								.addGap(0, 206, Short.MAX_VALUE)
+								.addComponent(button2))
+							.addComponent(erroreLabel, GroupLayout.DEFAULT_SIZE, 249, Short.MAX_VALUE))
+						.addContainerGap())
+			);
+			dialog1ContentPaneLayout.setVerticalGroup(
+				dialog1ContentPaneLayout.createParallelGroup()
+					.addGroup(GroupLayout.Alignment.TRAILING, dialog1ContentPaneLayout.createSequentialGroup()
+						.addContainerGap()
+						.addComponent(label13, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)
+						.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+						.addComponent(erroreLabel, GroupLayout.PREFERRED_SIZE, 30, GroupLayout.PREFERRED_SIZE)
+						.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+						.addComponent(button2)
+						.addContainerGap())
+			);
+			dialog1.pack();
+			dialog1.setLocationRelativeTo(dialog1.getOwner());
+		}
 		// //GEN-END:initComponents
 	}
 
-	private DefaultValueDataset datasetCPU;
-	private DefaultValueDataset datasetGPU;
+	public DefaultValueDataset datasetCPU;
+	public DefaultValueDataset datasetGPU;
 
 	private void setMeter() {
 		datasetCPU = new DefaultValueDataset(0D);
@@ -618,24 +696,6 @@ public class HPSsim {
 
 		datasetGPU = new DefaultValueDataset(0D);
 		JFreeChart jfreechartGPU = createChart(datasetGPU, "GPU Usage");
-
-		// JSlider jslider = new JSlider(-10, 110, 50);
-		// jslider.setMajorTickSpacing(10);
-		// jslider.setMinorTickSpacing(5);
-		// jslider.setPaintLabels(true);
-		// jslider.setPaintTicks(true);
-		//
-		// jslider.addChangeListener(new ChangeListener() {
-		//
-		// public void stateChanged(ChangeEvent changeevent)
-		// {
-		// JSlider jslider1 = (JSlider)changeevent.getSource();
-		// dataset.setValue(new Integer(jslider1.getValue()));
-		// }
-		//
-		// }
-		//
-		// );
 
 		panelCPU.add("Center", new ChartPanel(jfreechartCPU));
 		panelCPU.add("South", new Label(""));
@@ -657,7 +717,7 @@ public class HPSsim {
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY
 	// //GEN-BEGIN:variables
-	// Generated using JFormDesigner Evaluation license - Marco delle lande
+	// Generated using JFormDesigner Evaluation license - 
 	public JFrame HPSsimWindow;
 	private JPanel hpssimWindow;
 	private JTabbedPane hpssimTab;
@@ -692,32 +752,34 @@ public class HPSsim {
 	private JLabel label21;
 	private JSlider sliderclassRate;
 	private JLabel labelclassRate;
+	private JPanel vSpacer2;
 	private JButton resetButton;
-	private JPanel panelProcesses;
-	private JScrollPane scrollPane1;
-	private JTable tableProcess;
-	private JPanel panelGraph;
-	private JPanel graphPanel;
 	private JPanel panelPerformance;
 	private JPanel panelCPU;
 	private JPanel panelGPU;
 	private JSeparator separator1;
 	private JPanel panel1;
 	private JLabel label18;
-	private JTextField virtualTime;
+	public JTextField virtualTime;
 	private JLabel label5;
-	private JTextField processiNelSistema;
+	public JTextField processiNelSistema;
 	private JLabel label19;
-	private JTextField mediaUsoCPU;
+	public JTextField mediaUsoCPU;
 	private JLabel label17;
-	private JTextField processiElaborazione;
+	public JTextField processiElaborazione;
 	private JLabel label20;
-	private JTextField mediaUsoGPU;
+	public JTextField mediaUsoGPU;
 	private JLabel label16;
-	private JTextField processiInCoda;
+	public JTextField processiInCoda;
+	private JPanel panelGraph;
+	private JPanel graphPanel;
 	private JLabel title1;
-	private JButton okButton;
 	private JButton button1;
+	private JButton okButton;
 	private JSpinner spinner1;
+	private JDialog dialog1;
+	private JButton button2;
+	private JLabel label13;
+	private JLabel erroreLabel;
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 }

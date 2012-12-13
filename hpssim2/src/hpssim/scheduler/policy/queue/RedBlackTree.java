@@ -51,7 +51,11 @@ public class RedBlackTree implements IQueue {
 
 	@Override
 	public int size() {
-		return requestsQueue.size();
+		int size = requestsQueue.size();
+		if (curr != null)
+			return 1 + size;
+		else
+			return requestsQueue.size();
 	}
 
 	@Override

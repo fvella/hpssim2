@@ -121,6 +121,26 @@ public class HPSSimQueue implements IQueue {
 			return null;
 		}
 	}
+	public int getLenghtQueueCPU(){
+		if (requestsQueue.isEmpty()) {
+			return 0;
+		} else {
+			return size() - getLenghtQueueGPU();
+		}
+	}
+	public int getLenghtQueueGPU(){
+		if (requestsQueue.isEmpty()) {
+			return 0;
+		} else {
+			int size = 0;
+			for (int i = 0; i < requestsQueue.size(); i++) {
+				if (requestsQueue.get(i).classification == 1) {
+					size++;
+				}
+			}
+			return size;
+		}
+	}
 
 	/* (non-Javadoc)
 	 * @see hpssim.scheduler.policy.assignment.IQueue#sort()

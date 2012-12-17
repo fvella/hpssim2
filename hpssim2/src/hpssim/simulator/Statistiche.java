@@ -10,10 +10,29 @@ public class Statistiche {
 	private hpssim.scheduler.Configurator configuration;
 	
 	
-	private int lastExeTime;
+	private double lastExeTime;
 	private int processiNelSistema;
 	private int processiInElaborazione;
 	private int processiInCoda;
+	
+	private int processiInCodaCPU;
+	public int getProcessiInCodaCPU() {
+		return processiInCodaCPU;
+	}
+
+	public void setProcessiInCodaCPU(int processiInCodaCPU) {
+		this.processiInCodaCPU = processiInCodaCPU;
+	}
+
+	public int getProcessiInCodaGPU() {
+		return processiInCodaGPU;
+	}
+
+	public void setProcessiInCodaGPU(int processiInCodaGPU) {
+		this.processiInCodaGPU = processiInCodaGPU;
+	}
+
+	private int processiInCodaGPU;
 	
 	private List<Job> listaJob;
 
@@ -28,51 +47,65 @@ public class Statistiche {
 	public void setConfiguration(hpssim.scheduler.Configurator configuration) {
 		this.configuration = configuration;
 	}
-
+	
+	private int cpuFree,gpuFree;
+	public void setCPUFree(int cpu){
+		cpuFree = cpu;
+	}
+	public void setGPUFree(int gpu ){
+		gpuFree=gpu;
+	}
+	
 	public int getCpuLoad() {
 		
 		if(configuration.hw.numcpus() == 0)
 			return 0;
 		
-		if(configuration.hw.getCPUfree() == 0)
-			return 100;
-
-		else return (configuration.hw.getCPUfree() * 100 / configuration.hw.numcpus() );
+		else return ((configuration.hw.numcpus() - cpuFree));
 	}
 
 	public int getGpuLoad() {
 		if( configuration.hw.numgpus() == 0)
 			return 0;
 		
-		if(configuration.hw.getGPUfree() == 0)
-			return 100;
+		else return ((configuration.hw.numgpus() - gpuFree));
+	}
+	
+	public int getCpuLoadPerc() {
+		
+		if(configuration.hw.numcpus() == 0)
+			return 0;
+		
+		else return (getCpuLoad() * 100 / configuration.hw.numcpus() );
+	}
 
-		else return (configuration.hw.getGPUfree() * 100 / configuration.hw.numgpus() );
+	public int getGpuLoadPerc() {
+		if( configuration.hw.numgpus() == 0)
+			return 0;
+		
+		else return (getGpuLoad() * 100 / configuration.hw.numgpus() );
 	}
 
 	public int getProcessiNelSistema() {
-		return processiNelSistema;
-	}
-
-	public void setProcessiNelSistema(int processiNelSistema) {
-		this.processiNelSistema = processiNelSistema;
+		processiNelSistema = getProcessiInElaborazione() + getProcessiInCoda();
+		return processiNelSistema ;
 	}
 
 	public int getProcessiInElaborazione() {
-		
-		processiInElaborazione = processiNelSistema 
-				- (configuration.hw.numcpus() - configuration.hw.getCPUfree())
-				- (configuration.hw.numgpus() - configuration.hw.getGPUfree());
-		
 		return processiInElaborazione;
 	}
 
-
 	public int getProcessiInCoda() {
-		processiInCoda = processiNelSistema - getProcessiInElaborazione() ;
 		return processiInCoda;
 	}
 
+	public void setProcessiInElaborazione(int processiInElaborazione) {
+		this.processiInElaborazione = processiInElaborazione;
+	}
+
+	public void setProcessiInCoda(int processiInCoda) {
+		this.processiInCoda = processiInCoda;
+	}
 
 	public List<Job> getListaJob() {
 		if(listaJob==null)
@@ -80,11 +113,11 @@ public class Statistiche {
 		return listaJob;
 	}
 
-	public int getLastExeTime() {
+	public double getLastExeTime() {
 		return lastExeTime;
 	}
 
-	public void setLastExeTime(int lastExeTime) {
+	public void setLastExeTime(double lastExeTime) {
 		this.lastExeTime = lastExeTime;
 	}
 

@@ -7,6 +7,7 @@ import hpssim.scheduler.EventWorkFlow;
 import hpssim.scheduler.policy.queue.FIFO;
 import hpssim.scheduler.policy.queue.IQueue;
 import hpssim.scheduler.policy.scheduling.CompletelyFairScheduler;
+import hpssim.scheduler.policy.scheduling.HPSSimScheduler;
 import hpssim.scheduler.policy.scheduling.SchedulingPolicy;
 
 import java.util.logging.Level;
@@ -29,7 +30,7 @@ public class Simulator extends Thread {
 	public boolean run = false;
 
 	private int avgta;
-	private EventList events = new EventList();
+	private EventList events;
 	private double hjobrate;
 	private Hardware hw;
 	private int njobs;
@@ -41,9 +42,10 @@ public class Simulator extends Thread {
 	// public IQueue jobended = new Queue(0);
 
 	public IQueue jobended = new FIFO();
-	
+
 	public Statistiche stat;
 	private HPSsim owner;
+	private boolean endJob;
 
 	public Simulator(Hardware _hw, int _njobs, int _quantum, double _classificationRate, double _realTimeJobsProb, double _hjobrate, int _avgta, double _simTime) {
 		logger.setLevel(Level.INFO);
@@ -57,23 +59,35 @@ public class Simulator extends Thread {
 		this.avgta = _avgta;
 
 		time_sim = _simTime;
-		
+
 	}
 
 	public Simulator(hpssim.scheduler.Configurator conf, HPSsim hpSsim) {
-		tq = conf.qt;
+
+		this.events = new EventList();
+		this.tq = conf.qt;
 		this.njobs = conf.njobs;
 		this.classificationRate = conf.classificationRate;
 		this.realTimeJobsProb = conf.realTimeJobsProb;
 		this.hjobrate = conf.realTimeJobsProb;
 		this.hw = conf.hw;
 		this.avgta = conf.avgta;
+		this.endJob = conf.endJob;
 
-		time_sim = conf.simTime;
-		
-		stat = new Statistiche(conf);
-		owner = hpSsim;
+		this.time_sim = conf.simTime;
+
+		this.stat = new Statistiche(conf);
+		this.owner = hpSsim;
+
+		if (conf.scheduler.equals(HPSSimScheduler.class))
+			scheduler = new HPSSimScheduler(conf.queue, conf.qt);
+		else {
+			scheduler = new CompletelyFairScheduler(hw, events);
+			tq = (int) ((CompletelyFairScheduler) scheduler).sysctl_sched_latency;
+		}
+
 		init();
+
 		start();
 	}
 
@@ -111,8 +125,9 @@ public class Simulator extends Thread {
 				/*
 				 * uniform to selection gpu job according to gpujobrat to
 				 * implementhere
-				 */
-				job.setRcpu((int) randomJob.nextUniform(tq, time_sim / 100));
+//				 */
+				job.setRcpu((int) randomJob.nextExponential( time_sim / ( njobs)));
+//				job.setRcpu((int) randomJob.nextUniform(0, time_sim / (10 * njobs)));
 				if (randomJob.nextUniform(0, 1) > hjobrate) {
 					/* CPU JOB */
 					/* GPU time is long */
@@ -177,7 +192,7 @@ public class Simulator extends Thread {
 				gpujobs++;
 			Event ev = new Event(job, Event.ENQUEUE, job.timeArrival);
 			events.insertEvent(ev);
-			
+
 			stat.getListaJob().add(job);
 		}
 		if (infoLog)
@@ -187,9 +202,6 @@ public class Simulator extends Thread {
 		// if(infoLog) System.out.println(realTimeJobsProb);
 		hw.infosystem();
 		System.out.println("done");
-
-		// scheduler = new HPSSimScheduler(FIFO.class);
-		scheduler = new CompletelyFairScheduler(hw, events);
 	}
 
 	private Event clock() throws Exception {
@@ -270,67 +282,99 @@ public class Simulator extends Thread {
 	}
 
 	public void run() {
-		
+
 		try {
-			if(!run)
-				wait();
-			else
+			if (run)
+//				wait();
+//			else
 				simulate();
 		} catch (Exception e) {
 			e.printStackTrace();
 			new RuntimeException(e);
 		}
 	}
-
+	
+	int lastEvTime = 0;
+	int i = 0;
+	
 	public void simulate() throws Exception {
 		if (infoLog)
 			System.out.println("Start simulation...");
-		
+
 		long test = System.currentTimeMillis();
-		
+
 		if (infoLog)
 			System.out.println("Current Event - Ta - Next Event Generate - Ta - Device Status - Queue Size | Queue");
-		int lastEvTime = 0;
-		int i = 0;
+		
 
-//		synchronized (events) {
-			while (run) {
-				Thread.sleep(10);
-
-				Event ev = clock();
-				lastEvTime = ev.time;
-				
-				stat.setLastExeTime(lastEvTime);
-				
-				stat.setProcessiNelSistema(scheduler.size());
-				
-				owner.datasetCPU.setValue(stat.getCpuLoad());
-				owner.virtualTime.setText(""+stat.getLastExeTime());
-				owner.processiElaborazione.setText(""+stat.getProcessiInElaborazione());
-				owner.processiInCoda.setText(""+stat.getProcessiInCoda());
-				owner.processiNelSistema.setText(""+stat.getProcessiNelSistema());
-				
-				
-				// printProgBar((int) (lastEvTime / time_sim * 100));
-				i++;
-				if(lastEvTime > (time_sim) || (events.list.isEmpty()))
+		// synchronized (events) {
+		while (run) {
+			// Thread.sleep(10);
+			
+			if (!endJob) {
+				if (lastEvTime > (time_sim))
 					run = false;
 			}
-//		}
+			if (events.list.isEmpty()){
+				run = false;
+				break;
+			}
+			Event ev = clock();
+			lastEvTime = ev.time;
 
-		// q.printpriority();
-		// jobended.printjob();
-		if (infoLog)
-			System.out.println("");
-		if (infoLog)
-			jobended.printJobsStat();
-		if (infoLog)
-			System.out.println("");
-		if (infoLog)
-			System.out.println("" + i);
-		if (infoLog)
-			System.out.println("Tempo di esecuzione :" + (System.currentTimeMillis() - test));
-		
+			stat.setLastExeTime(new Double(lastEvTime)/1000d);
+			
+			if(scheduler instanceof CompletelyFairScheduler){
+				stat.setCPUFree(((CompletelyFairScheduler) scheduler).getCPUfree());
+				stat.setGPUFree(((CompletelyFairScheduler) scheduler).getGPUfree());
+			} else {
+				stat.setCPUFree(hw.getCPUfree());
+				stat.setGPUFree(hw.getGPUfree());
+			}
+			
+			stat.setProcessiInCoda(scheduler.size());
+			stat.setProcessiInElaborazione(scheduler.getProcessiInElaborazione(hw));
+			stat.setProcessiInCodaCPU(scheduler.getProcessiInCodaCPU());
+			stat.setProcessiInCodaGPU(scheduler.getProcessiInCodaGPU());
+			
+			
+			
+			owner.datasetCPU.setValue(stat.getCpuLoadPerc());
+			owner.datasetGPU.setValue(stat.getGpuLoadPerc());
+			owner.datasetQueueCPU.setValue(stat.getProcessiInCodaCPU());
+			owner.datasetQueueGPU.setValue(stat.getProcessiInCodaGPU());
+			
+			owner.virtualTime.setText("" + stat.getLastExeTime());
+
+			owner.processiNelSistema.setText("" + stat.getProcessiNelSistema());
+			owner.processiInCoda.setText("" + stat.getProcessiInCoda());
+			owner.processiElaborazione.setText("" + stat.getProcessiInElaborazione());
+			
+			owner.labelCPUUsage.setText(stat.getCpuLoad() + "/" + hw.numcpus() );
+			owner.labelGPUUsage.setText(stat.getGpuLoad() + "/" + hw.numgpus() );
+			
+			
+			if (!endJob) 
+				owner.progressBar.setValue((int) (lastEvTime * 100 / time_sim));
+			
+			// printProgBar((int) (lastEvTime / time_sim * 100));
+			i++;
+		}
+		// }
+
+			if (infoLog)
+				System.out.println("");
+			if (infoLog)
+				jobended.printJobsStat();
+			if (infoLog)
+				System.out.println("");
+			if (infoLog)
+				System.out.println("" + i);
+			if (infoLog)
+				System.out.println("Tempo di esecuzione :" + (System.currentTimeMillis() - test));
+			
+			owner.progressBar.setValue(100);
+
 	}
 
 	public void printProgBar(int percent) {

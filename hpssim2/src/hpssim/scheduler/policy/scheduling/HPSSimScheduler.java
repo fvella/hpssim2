@@ -10,7 +10,7 @@ import hpssim.simulator.Simulator;
 
 public class HPSSimScheduler implements SchedulingPolicy {
 
-	private IQueue queue;
+	private HPSSimQueue queue;
 	private int timeslice;
 
 	public HPSSimScheduler(Class<? extends HPSSimQueue> queueType, int timeslice) {
@@ -127,6 +127,23 @@ public class HPSSimScheduler implements SchedulingPolicy {
 		System.out.print("null " + "n/a" + " " + hw.getCPUfree() + " " + hw.getGPUfree() + " " + size() + " ");
 		System.out.print("Queue | ");
 		printjob();
+	}
+
+	@Override
+	public int getProcessiInElaborazione(Hardware hw) {
+		int elcpu = hw.numcpus() - hw.getCPUfree();
+		int elgpu = hw.numgpus() - hw.getGPUfree();
+		return elcpu + elgpu;
+	}
+
+	@Override
+	public int getProcessiInCodaCPU() {
+		return queue.getLenghtQueueCPU();
+	}
+
+	@Override
+	public int getProcessiInCodaGPU() {
+		return queue.getLenghtQueueGPU();
 	}
 
 }

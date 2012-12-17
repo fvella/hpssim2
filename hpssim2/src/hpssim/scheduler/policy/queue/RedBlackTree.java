@@ -30,6 +30,7 @@ public class RedBlackTree implements IQueue {
 			}
 		});
 		nome = string;
+		size = 0;
 	}
 
 	@Override
@@ -51,11 +52,14 @@ public class RedBlackTree implements IQueue {
 
 	@Override
 	public int size() {
-		int size = requestsQueue.size();
-		if (curr != null)
-			return 1 + size;
-		else
-			return requestsQueue.size();
+//		int size = 0;
+//		for (List<Job> jobQueue : requestsQueue.values()) {
+//			size += jobQueue.size();
+//		}
+//		if (curr != null)
+//			return 1 + size;
+//		else
+			return size;
 	}
 
 	@Override
@@ -116,7 +120,8 @@ public class RedBlackTree implements IQueue {
 		//
 		// TODO Auto-generated method stub
 	}
-
+	
+	private int size ;
 	@Override
 	public void insert(Job j) {
 		if (!requestsQueue.containsKey(getKey(j))) {
@@ -132,18 +137,29 @@ public class RedBlackTree implements IQueue {
 			 */
 			requestsQueue.get(getKey(j)).add(j);
 		}
+		size++;
 	}
 
 	@Override
 	public Job extract() {
 		if (requestsQueue.isEmpty())
 			return null;
-
-		List<Job> f = requestsQueue.get(requestsQueue.firstKey());
+		
+		size--;
+		
+		int fkey = requestsQueue.firstKey();
+		
+		List<Job> f = requestsQueue.get(fkey);
 		if (f.size() > 1)
 			setCurr(f.remove(0));
 		else
-			setCurr(requestsQueue.remove(requestsQueue.firstKey()).get(0));
+			setCurr(requestsQueue.remove(fkey).get(0));
+			
+		renqueue_weight -= getCurr().getWeight();
+		
+		if (requestsQueue.isEmpty())
+			renqueue_weight=1;
+		
 		return getCurr();
 	}
 

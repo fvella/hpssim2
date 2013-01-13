@@ -53,14 +53,20 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.TableModelListener;
 
+import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.MeterInterval;
 import org.jfree.chart.plot.MeterPlot;
+import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.ThermometerPlot;
+import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.Range;
 import org.jfree.data.general.DefaultValueDataset;
 import org.jfree.data.general.ValueDataset;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
+import org.jfree.ui.RectangleInsets;
 
 import com.jgoodies.forms.factories.DefaultComponentFactory;
 
@@ -155,8 +161,7 @@ public class HPSsim {
 			synchronized (sim) {
 				((Simulator) sim).run = true;
 				sim.notify();
-			}
-
+			} 
 		} catch (Exception e2) {
 			e2.printStackTrace();
 			erroreLabel.setText(e2.getMessage());
@@ -279,6 +284,12 @@ public class HPSsim {
 		processiElaborazione = new JTextField();
 		label16 = new JLabel();
 		processiInCoda = new JTextField();
+		label15 = new JLabel();
+		ldavg_1 = new JTextField();
+		label19 = new JLabel();
+		ldavg_5 = new JTextField();
+		label20 = new JLabel();
+		ldavg_15 = new JTextField();
 		panel3 = new JPanel();
 		progressBar = new JProgressBar();
 		panelGraph = new JPanel();
@@ -287,7 +298,6 @@ public class HPSsim {
 		button1 = new JButton();
 		okButton = new JButton();
 		button3 = new JButton();
-		spinner1 = new JSpinner();
 		dialog1 = new JDialog();
 		button2 = new JButton();
 		label13 = new JLabel();
@@ -553,7 +563,7 @@ public class HPSsim {
 						{
 							panel2.setLayout(new TableLayout(new double[][] {
 								{TableLayout.PREFERRED, TableLayout.FILL},
-								{TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED}}));
+								{TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED}}));
 
 							//---- label18 ----
 							label18.setText("Virtual Time");
@@ -583,6 +593,21 @@ public class HPSsim {
 							//---- processiInCoda ----
 							processiInCoda.setText("0");
 							panel2.add(processiInCoda, new TableLayoutConstraints(1, 4, 1, 4, TableLayoutConstraints.FULL, TableLayoutConstraints.FULL));
+
+							//---- label15 ----
+							label15.setText("ldavg_1");
+							panel2.add(label15, new TableLayoutConstraints(0, 5, 0, 5, TableLayoutConstraints.RIGHT, TableLayoutConstraints.FULL));
+							panel2.add(ldavg_1, new TableLayoutConstraints(1, 5, 1, 5, TableLayoutConstraints.FULL, TableLayoutConstraints.FULL));
+
+							//---- label19 ----
+							label19.setText("ldavg_5");
+							panel2.add(label19, new TableLayoutConstraints(0, 6, 0, 6, TableLayoutConstraints.RIGHT, TableLayoutConstraints.FULL));
+							panel2.add(ldavg_5, new TableLayoutConstraints(1, 6, 1, 6, TableLayoutConstraints.FULL, TableLayoutConstraints.FULL));
+
+							//---- label20 ----
+							label20.setText("ldavg_15");
+							panel2.add(label20, new TableLayoutConstraints(0, 7, 0, 7, TableLayoutConstraints.RIGHT, TableLayoutConstraints.FULL));
+							panel2.add(ldavg_15, new TableLayoutConstraints(1, 7, 1, 7, TableLayoutConstraints.FULL, TableLayoutConstraints.FULL));
 						}
 
 						//======== panel3 ========
@@ -606,8 +631,10 @@ public class HPSsim {
 													.addComponent(panel2, GroupLayout.PREFERRED_SIZE, 256, GroupLayout.PREFERRED_SIZE)
 													.addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
 													.addGroup(panelPerformanceLayout.createParallelGroup()
-														.addComponent(panel3, GroupLayout.PREFERRED_SIZE, 256, GroupLayout.PREFERRED_SIZE)
-														.addComponent(progressBar, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+														.addComponent(progressBar, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+														.addGroup(panelPerformanceLayout.createSequentialGroup()
+															.addComponent(panel3, GroupLayout.PREFERRED_SIZE, 256, GroupLayout.PREFERRED_SIZE)
+															.addGap(0, 0, Short.MAX_VALUE))))
 												.addGroup(panelPerformanceLayout.createSequentialGroup()
 													.addComponent(tabbedPane1, GroupLayout.PREFERRED_SIZE, 261, GroupLayout.PREFERRED_SIZE)
 													.addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
@@ -787,12 +814,29 @@ public class HPSsim {
 		// //GEN-END:initComponents
 	}
 
+	public org.jfree.data.xy.XYSeries datasetQueue = new XYSeries("Queue size");
+	
+	public void setQueueXY(){
+		XYSeriesCollection xyseriescollection = new XYSeriesCollection();
+		xyseriescollection.addSeries(datasetQueue);
+		
+		JFreeChart chart = ChartFactory.createXYLineChart("Queue Size",
+				"Tempo", "runq_sz", xyseriescollection,
+				PlotOrientation.VERTICAL, true, true, false);
+			XYPlot xyplot = (XYPlot) chart.getPlot();
+			xyplot.setBackgroundPaint(Color.white);
+			xyplot.setAxisOffset(new RectangleInsets(5D, 5D, 5D, 5D));
+			
+			panelGraph.add("Center", new ChartPanel(chart));
+			panelGraph.add("South", new Label(""));
+	}
+	
 	public DefaultValueDataset datasetCPU;
 	public DefaultValueDataset datasetGPU;
 	
 	public DefaultValueDataset datasetQueueCPU;
 	public DefaultValueDataset datasetQueueGPU;
-
+	
 	private void setMeter() {
 		datasetCPU = new DefaultValueDataset(0D);
 		JFreeChart jfreechartCPU = createChart(datasetCPU, "CPU Usage");
@@ -814,7 +858,7 @@ public class HPSsim {
 
 		gpuThermometerQueue.setSubrange(ThermometerPlot.NORMAL, 0.0, 10.0);
 		gpuThermometerQueue.setSubrange(ThermometerPlot.WARNING, 10.0, 25.0);
-		gpuThermometerQueue.setSubrange(ThermometerPlot.CRITICAL, 25.0, 50.0);
+		gpuThermometerQueue.setSubrange(ThermometerPlot.CRITICAL, 25.0, 5000.0);
 		gpuThermometerQueue.setUnits(ThermometerPlot.UNITS_NONE);
 		gpuThermometerQueue.setBulbRadius(22);
 		gpuThermometerQueue.setColumnRadius(20);
@@ -824,7 +868,7 @@ public class HPSsim {
 
 		cpuThermometerQueue.setSubrange(ThermometerPlot.NORMAL, 0.0, 10.0);
 		cpuThermometerQueue.setSubrange(ThermometerPlot.WARNING, 10.0, 25.0);
-		cpuThermometerQueue.setSubrange(ThermometerPlot.CRITICAL, 25.0, 50.0);
+		cpuThermometerQueue.setSubrange(ThermometerPlot.CRITICAL, 25.0, 5000.0);
 		cpuThermometerQueue.setUnits(ThermometerPlot.UNITS_NONE);
 		cpuThermometerQueue.setBulbRadius(22);
 		cpuThermometerQueue.setColumnRadius(20);
@@ -903,6 +947,12 @@ public class HPSsim {
 	public JTextField processiElaborazione;
 	private JLabel label16;
 	public JTextField processiInCoda;
+	private JLabel label15;
+	public JTextField ldavg_1;
+	private JLabel label19;
+	public JTextField ldavg_5;
+	private JLabel label20;
+	public JTextField ldavg_15;
 	private JPanel panel3;
 	public JProgressBar progressBar;
 	private JPanel panelGraph;
@@ -911,7 +961,6 @@ public class HPSsim {
 	private JButton button1;
 	private JButton okButton;
 	private JButton button3;
-	private JSpinner spinner1;
 	private JDialog dialog1;
 	private JButton button2;
 	private JLabel label13;

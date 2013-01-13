@@ -306,10 +306,7 @@ public class Simulator extends Thread {
 		if (infoLog)
 			System.out.println("Current Event - Ta - Next Event Generate - Ta - Device Status - Queue Size | Queue");
 		
-
-		// synchronized (events) {
 		while (run) {
-			// Thread.sleep(10);
 			
 			if (!endJob) {
 				if (lastEvTime > (time_sim))
@@ -336,13 +333,18 @@ public class Simulator extends Thread {
 			stat.setProcessiInElaborazione(scheduler.getProcessiInElaborazione(hw));
 			stat.setProcessiInCodaCPU(scheduler.getProcessiInCodaCPU());
 			stat.setProcessiInCodaGPU(scheduler.getProcessiInCodaGPU());
+			stat.calc_load();
 			
+			
+			/************************************************/
 			
 			
 			owner.datasetCPU.setValue(stat.getCpuLoadPerc());
 			owner.datasetGPU.setValue(stat.getGpuLoadPerc());
 			owner.datasetQueueCPU.setValue(stat.getProcessiInCodaCPU());
 			owner.datasetQueueGPU.setValue(stat.getProcessiInCodaGPU());
+			
+			owner.datasetQueue.add(time_sim, stat.getRunq_sz());
 			
 			owner.virtualTime.setText("" + stat.getLastExeTime());
 
@@ -353,14 +355,15 @@ public class Simulator extends Thread {
 			owner.labelCPUUsage.setText(stat.getCpuLoad() + "/" + hw.numcpus() );
 			owner.labelGPUUsage.setText(stat.getGpuLoad() + "/" + hw.numgpus() );
 			
+			owner.ldavg_1.setText(""+stat.getLdavg_1());
+			owner.ldavg_5.setText(""+stat.getLdavg_5());
+			owner.ldavg_15.setText(""+stat.getLdavg_15());
 			
 			if (!endJob) 
 				owner.progressBar.setValue((int) (lastEvTime * 100 / time_sim));
 			
-			// printProgBar((int) (lastEvTime / time_sim * 100));
 			i++;
 		}
-		// }
 
 			if (infoLog)
 				System.out.println("");
@@ -374,7 +377,7 @@ public class Simulator extends Thread {
 				System.out.println("Tempo di esecuzione :" + (System.currentTimeMillis() - test));
 			
 			owner.progressBar.setValue(100);
-
+			owner.setQueueXY();
 	}
 
 	public void printProgBar(int percent) {

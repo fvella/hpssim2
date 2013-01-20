@@ -325,7 +325,6 @@ new FormModel {
 						add( new FormComponent( "javax.swing.JCheckBox" ) {
 							name: "checkBox_enableLog"
 							"text": "log"
-							"selected": true
 						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
 							"gridX": 7
 							"gridY": 14

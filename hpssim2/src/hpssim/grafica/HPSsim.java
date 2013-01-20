@@ -78,7 +78,7 @@ public class HPSsim {
 
 	public Thread sim;
 	
-	private boolean endJobs = false;
+	private boolean endJobs = true;
 	public boolean realtimeStat = true;
 	
 	public HPSsim() {
@@ -270,6 +270,30 @@ public class HPSsim {
 			}
 		}
 	}
+	
+	private void eseguiBatch(Configurator conf) throws Exception{
+		long time = System.currentTimeMillis();
+		endJobs = false;
+		for(int i =1; i<11; i++){
+			for(int j = 0; j<=i;j++){
+				while(endJobs){
+					 Thread.sleep(1000);
+				 }
+			     endJobs=true;
+				 conf.hw = new Hardware(i, j);
+				 startSimulation(conf);
+			}
+		 }
+		
+		while(endJobs){
+			 Thread.sleep(1000);
+		 }
+		conf.hw = new Hardware(10, 256);
+		startSimulation(conf);
+		
+		System.out.println("Esecuzione BATCH terminata "+ (System.currentTimeMillis()-time)/1000l);
+	}
+	
 //COSTANTE
 	private void button_CostanteCodaSuMediaActionPerformed(ActionEvent e) {
 		realtimeStat=false;
@@ -283,7 +307,7 @@ public class HPSsim {
 											/*mediaEsecJob*/	997.9d,
 											/*classRate*/		1d, 
 											/*rtJobProb*/		0.17d, 
-											/*clPerc*/			0.15d, 
+											/*clPerc*/			0.17d, 
 											/*mediaArrivo*/		1000, 
 											/*simTime*/			362011, 
 											CompletelyFairScheduler.class ,
@@ -309,44 +333,61 @@ public class HPSsim {
 		realtimeStat=false;
 		try {
 			Hardware hw = new Hardware(1, 0);
+			//POCHI OPENCL
+//     		 Configurator conf = new Configurator(hw, //Hardware
+//											/*NJOB*/			1000,    
+//											/*QT*/				210, 
+//											/*mediaEsecJob*/	200d,
+//											/*classRate*/		1d, 
+//											/*rtJobProb*/		0.17d, 
+//											/*clPerc*/			0.17d, 
+//											/*mediaArrivo*/		200, 
+//											/*simTime*/			362011, 
+//											CompletelyFairScheduler.class ,
+//											RedBlackTree.class,
+//											/*endJob*/			false,
+//											/*costante*/		true, false);
+			 //TANTI OPENCL
      		 Configurator conf = new Configurator(hw, //Hardware
-											/*NJOB*/			1000,    
-											/*QT*/				210, 
-											/*mediaEsecJob*/	200d,
-											/*classRate*/		1d, 
-											/*rtJobProb*/		0.17d, 
-											/*clPerc*/			0.20d, 
-											/*mediaArrivo*/		200, 
-											/*simTime*/			362011, 
-											CompletelyFairScheduler.class ,
-											RedBlackTree.class,
-											/*endJob*/			false,
-											/*costante*/		true, false);
+						/*NJOB*/			10000,    
+						/*QT*/				210, 
+						/*mediaEsecJob*/	997.9d,
+						/*classRate*/		1d, 
+						/*rtJobProb*/		0.15d, 
+						/*clPerc*/			0.60d, 
+						/*mediaArrivo*/		1000, 
+						/*simTime*/			360000, 
+						CompletelyFairScheduler.class ,
+						RedBlackTree.class,
+						/*endJob*/			false,
+						/*costante*/		true, false);
+     		 
+     		 
+//			 conf.hw = new Hardware(1, 1);
+//			 conf.hw = new Hardware(2, 0);
+//			 conf.hw = new Hardware(2, 1);
+//			 conf.hw = new Hardware(2, 2);
+//			 conf.hw = new Hardware(3, 0);
+//			 conf.hw = new Hardware(3, 1);
+//			 conf.hw = new Hardware(3, 2);
+//			 conf.hw = new Hardware(3, 3);
+//			 conf.hw = new Hardware(4, 0);
+//			 conf.hw = new Hardware(4, 1);
+//			 conf.hw = new Hardware(4, 2);
+//			 conf.hw = new Hardware(4, 3);
+//			 conf.hw = new Hardware(4, 4);
+//			 conf.hw = new Hardware(5, 0);
+//			 conf.hw = new Hardware(5, 1);
+//			 conf.hw = new Hardware(5, 2);
+//			 conf.hw = new Hardware(5, 3);
+//			 conf.hw = new Hardware(5, 4);
+//			 conf.hw = new Hardware(5, 5);
+//			 conf.hw = new Hardware(10, 256);
+//			 
+//			 startSimulation(conf);
 			 
-			 
-			 conf.hw = new Hardware(1, 1);
-			 conf.hw = new Hardware(2, 0);
-			 conf.hw = new Hardware(2, 1);
-			 conf.hw = new Hardware(2, 2);
-			 conf.hw = new Hardware(3, 0);
-			 conf.hw = new Hardware(3, 1);
-			 conf.hw = new Hardware(3, 2);
-			 conf.hw = new Hardware(3, 3);
-			 conf.hw = new Hardware(4, 0);
-			 conf.hw = new Hardware(4, 1);
-			 conf.hw = new Hardware(4, 2);
-			 conf.hw = new Hardware(4, 3);
-			 conf.hw = new Hardware(4, 4);
-			 conf.hw = new Hardware(5, 0);
-			 conf.hw = new Hardware(5, 1);
-			 conf.hw = new Hardware(5, 2);
-			 conf.hw = new Hardware(5, 3);
-			 conf.hw = new Hardware(5, 4);
-			 conf.hw = new Hardware(5, 5);
-			 conf.hw = new Hardware(10, 256);
-			 
-			 startSimulation(conf);
-			 
+     		 eseguiBatch(conf);
+     		 
 //			 for(int i = 2; i<5 ; i++){
 //				 for(int j = 0; j<=i ; j++){
 //					 conf.hw = new Hardware(i, j);
@@ -366,44 +407,37 @@ public class HPSsim {
 		realtimeStat=false;
 		try {
 			Hardware hw = new Hardware(1, 0);
+//			 Configurator conf = new Configurator(hw, //Hardware
+//						/*NJOB*/			1000,    
+//						/*QT*/				210, 
+//						/*mediaEsecJob*/	1000d,
+//						/*classRate*/		1d, 
+//						/*rtJobProb*/		0.17d, 
+//						/*clPerc*/			0.17d, 
+//						/*mediaArrivo*/		4000, 
+//						/*simTime*/			362011, 
+//						CompletelyFairScheduler.class ,
+//						RedBlackTree.class,
+//						/*endJob*/			false,
+//						/*costante*/		false,
+//						/*crescente*/ true);
+			 //OPENCL
 			 Configurator conf = new Configurator(hw, //Hardware
-						/*NJOB*/			1000,    
+						/*NJOB*/			10000,    
 						/*QT*/				210, 
 						/*mediaEsecJob*/	1000d,
 						/*classRate*/		1d, 
-						/*rtJobProb*/		0.17d, 
-						/*clPerc*/			0.15d, 
+						/*rtJobProb*/		0.15d, 
+						/*clPerc*/			0.60d, 
 						/*mediaArrivo*/		4000, 
-						/*simTime*/			362011, 
+						/*simTime*/			360000, 
 						CompletelyFairScheduler.class ,
 						RedBlackTree.class,
 						/*endJob*/			false,
 						/*costante*/		false,
 						/*crescente*/ true);
 			 
-			 
-			 conf.hw = new Hardware(1, 1);
-			 conf.hw = new Hardware(2, 0);
-			 conf.hw = new Hardware(2, 1);
-			 conf.hw = new Hardware(2, 2);
-			 conf.hw = new Hardware(3, 0);
-			 conf.hw = new Hardware(3, 1);
-			 conf.hw = new Hardware(3, 2);
-			 conf.hw = new Hardware(3, 3);
-			 conf.hw = new Hardware(4, 0);
-			 conf.hw = new Hardware(4, 1);
-			 conf.hw = new Hardware(4, 2);
-			 conf.hw = new Hardware(4, 3);
-			 conf.hw = new Hardware(4, 4);
-			 conf.hw = new Hardware(5, 0);
-			 conf.hw = new Hardware(5, 1);
-			 conf.hw = new Hardware(5, 2);
-			 conf.hw = new Hardware(5, 3);
-			 conf.hw = new Hardware(5, 4);
-			 conf.hw = new Hardware(5, 5);
-			 conf.hw = new Hardware(10, 256);
-			 
-			 startSimulation(conf);
+			 eseguiBatch(conf);
 
 		} catch (Exception e1) {
 			e1.printStackTrace();
@@ -424,7 +458,7 @@ public class HPSsim {
 											/*mediaEsecJob*/	1000d,
 											/*classRate*/		1d, 
 											/*rtJobProb*/		0.17d, 
-											/*clPerc*/			0.15d, 
+											/*clPerc*/			0.17d, 
 											/*mediaArrivo*/		4000, 
 											/*simTime*/			362011, 
 											CompletelyFairScheduler.class ,
@@ -458,14 +492,14 @@ public class HPSsim {
 											/*mediaEsecJob*/	1000d,
 											/*classRate*/		1d, 
 											/*rtJobProb*/		0.17d, 
-											/*clPerc*/			0.15d, 
+											/*clPerc*/			0.17d, 
 											/*mediaArrivo*/		200, 
 											/*simTime*/			362011, 
 											CompletelyFairScheduler.class ,
 											RedBlackTree.class,
 											/*endJob*/			false,
 											/*costante*/		false, false);
-			 
+			
 			 startSimulation(conf);
 			 
 			 synchronized(this){	 
@@ -483,43 +517,35 @@ public class HPSsim {
 		realtimeStat=false;
 		try {
 			Hardware hw = new Hardware(1, 0);
-			Configurator conf = new Configurator(hw, //Hardware
-					/*NJOB*/			1000,    
-					/*QT*/				210, 
-					/*mediaEsecJob*/	1000d,
-					/*classRate*/		1d, 
-					/*rtJobProb*/		0.17d, 
-					/*clPerc*/			0.15d, 
-					/*mediaArrivo*/		200, 
-					/*simTime*/			362011, 
-					CompletelyFairScheduler.class ,
-					RedBlackTree.class,
-					/*endJob*/			false,
-					/*costante*/		false, false);
+//			Configurator conf = new Configurator(hw, //Hardware
+//					/*NJOB*/			10000,    
+//					/*QT*/				210, 
+//					/*mediaEsecJob*/	1000d,
+//					/*classRate*/		1d, 
+//					/*rtJobProb*/		0.17d, 
+//					/*clPerc*/			0.17d, 
+//					/*mediaArrivo*/		200, 
+//					/*simTime*/			362011, 
+//					CompletelyFairScheduler.class ,
+//					RedBlackTree.class,
+//					/*endJob*/			false,
+//					/*costante*/		false, false);
 			 
-			 
-//			 conf.hw = new Hardware(1, 1);
-			 conf.hw = new Hardware(2, 0);
-			 conf.hw = new Hardware(2, 1);
-			 conf.hw = new Hardware(2, 2);
-			 conf.hw = new Hardware(3, 0);
-			 conf.hw = new Hardware(3, 1);
-			 conf.hw = new Hardware(3, 2);
- 		     conf.hw = new Hardware(3, 3);
-			 conf.hw = new Hardware(4, 0);
-			 conf.hw = new Hardware(4, 1);
-			 conf.hw = new Hardware(4, 2);
-			 conf.hw = new Hardware(4, 3);
-			 conf.hw = new Hardware(4, 4);
-			 conf.hw = new Hardware(5, 0);
-			 conf.hw = new Hardware(5, 1);
-			 conf.hw = new Hardware(5, 2);
-			 conf.hw = new Hardware(5, 3);
-			 conf.hw = new Hardware(5, 4);
-			 conf.hw = new Hardware(5, 5);
-			 conf.hw = new Hardware(10, 256);
-			 
-			 startSimulation(conf);
+			//OPENCL
+			 Configurator conf = new Configurator(hw, //Hardware
+						/*NJOB*/			10000,    
+						/*QT*/				210, 
+						/*mediaEsecJob*/	1000d,
+						/*classRate*/		1d, 
+						/*rtJobProb*/		0.15d, 
+						/*clPerc*/			0.60d, 
+						/*mediaArrivo*/		200, 
+						/*simTime*/			360000, 
+						CompletelyFairScheduler.class ,
+						RedBlackTree.class,
+						/*endJob*/			false,
+						/*costante*/		false, false);
+			eseguiBatch(conf);
 
 		} catch (Exception e1) {
 			e1.printStackTrace();
@@ -540,7 +566,7 @@ public class HPSsim {
 											/*mediaEsecJob*/	1000d,
 											/*classRate*/		Double.parseDouble(text_ClassRate.getText()), 
 											/*rtJobProb*/		0.25d, 
-											/*clPerc*/			0.40d, 
+											/*clPerc*/			0.25d, 
 											/*mediaArrivo*/		700, 
 											/*simTime*/			362011, 
 											CompletelyFairScheduler.class ,
@@ -565,44 +591,35 @@ public class HPSsim {
 		realtimeStat=false;
 		try {
 			Hardware hw = new Hardware(1, 0);
+//			 Configurator conf = new Configurator(hw, //Hardware
+//						/*NJOB*/			1000,    
+//						/*QT*/				210, 
+//						/*mediaEsecJob*/	1000d,
+//						/*classRate*/		0.5d, 
+//						/*rtJobProb*/		0.25d, 
+//						/*clPerc*/			0.25d, 
+//						/*mediaArrivo*/		700, 
+//						/*simTime*/			362011, 
+//						CompletelyFairScheduler.class ,
+//						RedBlackTree.class,
+//						/*endJob*/			false,
+//						/*costante*/		false, false);
+			 //OPENCL
 			 Configurator conf = new Configurator(hw, //Hardware
-						/*NJOB*/			1000,    
+						/*NJOB*/			10000,    
 						/*QT*/				210, 
 						/*mediaEsecJob*/	1000d,
-						/*classRate*/		0.9d, 
-						/*rtJobProb*/		0.25d, 
-						/*clPerc*/			0.40d, 
+						/*classRate*/		0.5d, 
+						/*rtJobProb*/		0.15d, 
+						/*clPerc*/			0.60d, 
 						/*mediaArrivo*/		700, 
-						/*simTime*/			362011, 
+						/*simTime*/			360000, 
 						CompletelyFairScheduler.class ,
 						RedBlackTree.class,
 						/*endJob*/			false,
 						/*costante*/		false, false);
 			 
-			 
-//			 conf.hw = new Hardware(1, 1);
-//			 conf.hw = new Hardware(2, 0);
-//			 conf.hw = new Hardware(2, 1);
-//			 conf.hw = new Hardware(2, 2);
-//			 conf.hw = new Hardware(3, 0);
-//			 conf.hw = new Hardware(3, 1);
-//			 conf.hw = new Hardware(3, 2);
-// 		     conf.hw = new Hardware(3, 3);
-//			 conf.hw = new Hardware(4, 0);
-//			 conf.hw = new Hardware(4, 1);
-//			 conf.hw = new Hardware(4, 2);
-//			 conf.hw = new Hardware(4, 3);
-//			 conf.hw = new Hardware(4, 4);
-//			 conf.hw = new Hardware(5, 0);
-//			 conf.hw = new Hardware(5, 1);
-//			 conf.hw = new Hardware(5, 2);
-//			 conf.hw = new Hardware(5, 3);
-//			 conf.hw = new Hardware(5, 4);
-//			 conf.hw = new Hardware(5, 5);
-//			 conf.hw = new Hardware(10, 256);
-//			 
-			 startSimulation(conf);
-
+			 eseguiBatch(conf);
 		} catch (Exception e1) {
 			e1.printStackTrace();
 			erroreLabel.setText(e1.getMessage());
@@ -939,7 +956,6 @@ public class HPSsim {
 
 						//---- checkBox_enableLog ----
 						checkBox_enableLog.setText("log");
-						checkBox_enableLog.setSelected(true);
 						panelConfiguration.add(checkBox_enableLog, new TableLayoutConstraints(7, 14, 7, 14, TableLayoutConstraints.FULL, TableLayoutConstraints.FULL));
 					}
 					hpssimTab.addTab("Configuration", panelConfiguration);

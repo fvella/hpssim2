@@ -34,7 +34,7 @@ public class Simulator extends Thread {
 
 	private int avgta;
 	private EventList events;
-	private double hjobrate;
+	private double percentOpenCLjob;
 	private Hardware hw;
 	private int njobs;
 	private double realTimeJobsProb, mediaEsecuzioneJob;
@@ -58,7 +58,7 @@ public class Simulator extends Thread {
 		this.njobs = _njobs;
 		this.classificationRate = _classificationRate;
 		this.realTimeJobsProb = _realTimeJobsProb;
-		this.hjobrate = _hjobrate;
+		this.percentOpenCLjob = _hjobrate;
 		this.hw = _hw;
 		this.avgta = _avgta;
 		this.mediaEsecuzioneJob = mediaEsecuzioneJob;
@@ -80,7 +80,7 @@ public class Simulator extends Thread {
 		this.njobs = conf.njobs;
 		this.classificationRate = conf.classificationRate;
 		this.realTimeJobsProb = conf.realTimeJobsProb;
-		this.hjobrate = conf.realTimeJobsProb;
+		this.percentOpenCLjob = conf.percentOpenCLjob;
 		this.hw = conf.hw;
 		this.avgta = conf.avgta;
 		this.endJob = conf.endJob;
@@ -155,7 +155,8 @@ public class Simulator extends Thread {
 				else
 					job.setExecutionTimeCPU((int) randomJob.nextExponential(mediaEsecuzioneJob));
 //				job.setRcpu((int) randomJob.nextUniform(0, time_sim / (10 * njobs)));
-				if (randomJob.nextUniform(0, 1) > hjobrate) {
+				
+				if (randomJob.nextUniform(0, 1) > percentOpenCLjob) {
 					/* CPU JOB */
 					/* GPU time is long */
 					job.setExecutionTimeGPU((int) (job.getExecutionTimeCPU() * randomJob.nextUniform(1, 300)));
@@ -167,12 +168,12 @@ public class Simulator extends Thread {
 				}
 
 				if (randomJob.nextUniform(0, 1) > classificationRate) {
-					/* sbaglio classificazione */
-					if (job.getExecutionTimeCPU() > job.getExecutionTimeGPU()) {
+					/* sbaglio classificazione invece che metterlo in gpu lo mette in cpu*/
+//					if (job.getExecutionTimeCPU() > job.getExecutionTimeGPU()) {
 						job.setClassification(0);
-					} else {
-						job.setClassification(1);
-					}
+//					} else {
+//						job.setClassification(1);
+//					}
 				} else {
 					/* azzecco classificazione */
 					if (job.getExecutionTimeCPU() > job.getExecutionTimeGPU()) {
@@ -418,7 +419,7 @@ public class Simulator extends Thread {
 			owner.progressBar.setValue(100);
 			
 			stat.endStatistiche();
-			owner.setEndJobs(true);
+			
 
 			if(!owner.realtimeStat){
 				PrintWriter output = new PrintWriter(new FileWriter("c:/stat.csv",true));
@@ -444,6 +445,8 @@ public class Simulator extends Thread {
 				output.printf("%s\r\n", stringa);
 				output.close();
 			}
+			
+			owner.setEndJobs(false);
 	}
 
 	public void printProgBar(int percent) {

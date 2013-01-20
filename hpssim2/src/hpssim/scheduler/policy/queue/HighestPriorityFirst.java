@@ -35,7 +35,7 @@ public class HighestPriorityFirst extends HPSSimQueue {
 	public void insert(Job request) {
 		boolean added = false;
 		for (int i = 0; i < requestsQueue.size() && !added; i++) {
-			if (request.getPriority() < requestsQueue.get(i).getPriority()) {
+			if (request.getProcessPriority() < requestsQueue.get(i).getProcessPriority()) {
 				added = true;
 				requestsQueue.add(i, request);
 			}

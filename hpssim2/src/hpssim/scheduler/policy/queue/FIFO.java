@@ -3,6 +3,7 @@ package hpssim.scheduler.policy.queue;
 import hpssim.simulator.Job;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class implements a First In First Out assignment policy.
@@ -58,5 +59,9 @@ public class FIFO extends HPSSimQueue {
 	public String toString() {
 		return "First In First Out";
 	}
-
+	
+	public List<Job> getList(){
+		return requestsQueue;
+	}
+	
 }

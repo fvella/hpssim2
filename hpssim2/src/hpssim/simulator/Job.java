@@ -8,25 +8,25 @@ public class Job /* implements Comparable<Job> */{
 	 * RunCPU RunGPU TimeRemaining TqTeTr
 	 */
 
-	public int timeArrival; /* arrival time */
-	public int classification; /* classification: 0 cpu 1 gpu */
-	public int processPriority; /* process priority */
-	public int schedulingPriority; /* scheduling priority */
-	public int deviceScheduled; /* scheduled device */
-	public int executionTimeCPU;
-	public int executionTimeGPU; /* execution time (cpu or gpu) */
-	public int remainingTime; /* remaining time */
-	public int queueTime; /* queue time */
-	public int executionTime; /* execution time */
-	public int tfinalize; /**/
-	public int rescheduled;
-	public int type; /* O realttime 1 user */
+	private int timeArrival; /* arrival time */
+	private int classification; /* classification: 0 cpu 1 gpu */
+	private int processPriority; /* process priority */
+	private int schedulingPriority; /* scheduling priority */
+	private int deviceScheduled; /* scheduled device */
+	private int executionTimeCPU;
+	private int executionTimeGPU; /* execution time (cpu or gpu) */
+	private int remainingTime; /* remaining time */
+	private int queueTime; /* queue time */
+	private int executionTime; /* execution time */
+	private int tfinalize; /**/
+	private int rescheduled;
+	private int type; /* O realttime 1 user */
 	public final int id;
 
-	public Integer vruntime; /* valore per CFS */
-	public int nice;
-	public Integer lastExecutionTime;
-	public int queue;
+	private Integer vruntime; /* valore per CFS */
+	private int nice;
+	private Integer lastExecutionTime;
+	private int queue;
 	
 	/*
 	 * Costructor
@@ -121,140 +121,24 @@ public class Job /* implements Comparable<Job> */{
 	public String toString() {
 		return "ID " + this.id + " TA " + this.timeArrival + " "
 				+ getType() + " | " + "class " + this.classification
-				+ " CPU and GPU timeservice " + this.getRcpu() + " "
-				+ this.getRgpu();
+				+ " CPU and GPU timeservice " + this.getExecutionTimeCPU() + " "
+				+ this.getExecutionTimeGPU();
 	}
 	public int getWeight() {
 		return CompletelyFairScheduler.prio_to_weight[nice];
 	}
 	
-	/*
-	 * Get methods
-	 */
-	
-	
 	public String getType(){
 		if(type==0) return "RT";
 		return "US";
 	}
-	
-	public int getTa() {
-		return timeArrival;
+	public int getProcessType(){
+		return type;
 	}
-
-	public void setTa(int ta) {
-		this.timeArrival = ta;
-	}
-
-	public int getClassification() {
-		return classification;
-	}
-
-	public void setClassification(int classification) {
-		this.classification = classification;
-	}
-
-	public int getPp() {
-		return processPriority;
-	}
-
-	public void setPp(int pp) {
-		this.processPriority = pp;
-	}
-
-	public int getPs() {
-		return schedulingPriority;
-	}
-
-	public void setPs(int ps) {
-		this.schedulingPriority = ps;
-	}
-
-	public int getDevicesched() {
-		return deviceScheduled;
-	}
-
-	public void setDevicesched(int devicesched) {
-		this.deviceScheduled = devicesched;
-	}
-
-	public int getRcpu() {
-		return executionTimeCPU;
-	}
-
-	public void setRcpu(int rcpu) {
-		this.executionTimeCPU = rcpu;
-	}
-
-	public int getRgpu() {
-		return executionTimeGPU;
-	}
-
-	public void setRgpu(int rgpu) {
-		this.executionTimeGPU = rgpu;
-	}
-
-	public int getTrem() {
-		return remainingTime;
-	}
-
-	public void setTrem(int trem) {
-		this.remainingTime = trem;
-	}
-
-	public int getTq() {
-		return queueTime;
-	}
-
-	public void setTq(int tq) {
-		this.queueTime = tq;
-	}
-
-	public int getTe() {
-		return executionTime;
-	}
-
-	public void setTe(int te) {
-		this.executionTime = te;
-	}
-
-	public int getTfinalize() {
-		return tfinalize;
-	}
-
-	public void setTfinalize(int tfinalize) {
-		this.tfinalize = tfinalize;
-	}
-
-	public int getRescheduled() {
-		return rescheduled;
-	}
-
-	public void setRescheduled(int rescheduled) {
-		this.rescheduled = rescheduled;
-	}
-
-	public void setType(int type) {
-		this.type = type;
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	// public int compareTo(Job o2) {
-	// if (this.ps > ((Job)o2).ps) return 1;
-	// return -1;
-	// }
-	//
-	// ASC priority compare
-	// public int compareTo(Job o2) {
-	// return (schedulingPriority > o2.schedulingPriority ? 1 :
-	// (schedulingPriority == o2.schedulingPriority ? 0 : -1));
-	// }
-
-	public int getPriority() {
-		return schedulingPriority;
+	public Integer getLastExecutionTime() {
+		if(lastExecutionTime==null)
+			return new Integer(executionTime);
+		return lastExecutionTime;
 	}
 
 	public int getTimeArrival() {
@@ -263,6 +147,14 @@ public class Job /* implements Comparable<Job> */{
 
 	public void setTimeArrival(int timeArrival) {
 		this.timeArrival = timeArrival;
+	}
+
+	public int getClassification() {
+		return classification;
+	}
+
+	public void setClassification(int classification) {
+		this.classification = classification;
 	}
 
 	public int getProcessPriority() {
@@ -329,6 +221,22 @@ public class Job /* implements Comparable<Job> */{
 		this.executionTime = executionTime;
 	}
 
+	public int getTfinalize() {
+		return tfinalize;
+	}
+
+	public void setTfinalize(int tfinalize) {
+		this.tfinalize = tfinalize;
+	}
+
+	public int getRescheduled() {
+		return rescheduled;
+	}
+
+	public void setRescheduled(int rescheduled) {
+		this.rescheduled = rescheduled;
+	}
+
 	public Integer getVruntime() {
 		return vruntime;
 	}
@@ -344,16 +252,31 @@ public class Job /* implements Comparable<Job> */{
 	public void setNice(int nice) {
 		this.nice = nice;
 	}
-	
-	public Integer getLastExecutionTime() {
-		
-		if(lastExecutionTime==null)
-			return new Integer(executionTime);
-		
-		return lastExecutionTime;
+
+	public int getQueue() {
+		return queue;
 	}
 
-	public void setLastExecutionTime(int lastExecutionTime) {
+	public void setQueue(int queue) {
+		this.queue = queue;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setType(int type) {
+		this.type = type;
+	}
+
+	public void setLastExecutionTime(Integer lastExecutionTime) {
 		this.lastExecutionTime = lastExecutionTime;
 	}
+	
+	/*
+	 * Get methods
+	 */
+	
+	
+	
 }

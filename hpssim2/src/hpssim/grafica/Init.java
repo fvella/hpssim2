@@ -260,7 +260,7 @@ public class Init {
 			public void actionPerformed(ActionEvent arg0) {
 				
 				Hardware hw = new Hardware(Integer.valueOf(text_nCPU.getText()),Integer.valueOf(text_nGPU.getText()));                
-                Simulator sim = new Simulator(hw, Integer.valueOf(text_njobs.getText()), Integer.valueOf(text_QT.getText()) , Double.valueOf(text_ClassRate.getText()) , Double.valueOf(text_RealTimeJPro.getText()) , Double.valueOf( text_PercOpenCLJ.getText()), Integer.valueOf(text_AVGTA.getText()),100000d);
+                Simulator sim = new Simulator(hw, Integer.valueOf(text_njobs.getText()), Integer.valueOf(text_QT.getText()) , 210 ,Double.valueOf(text_ClassRate.getText()) , Double.valueOf(text_RealTimeJPro.getText()) , Double.valueOf( text_PercOpenCLJ.getText()), Integer.valueOf(text_AVGTA.getText()), 100000d);
                 
 //                IScheduler s = new HPSSimScheduler(IScheduler.FIFO);
                 sim.init();

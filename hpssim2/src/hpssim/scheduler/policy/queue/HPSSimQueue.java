@@ -50,24 +50,24 @@ public class HPSSimQueue implements IQueue {
 	final void push(Job j) {
 		if (requestsQueue.isEmpty()) {
 			requestsQueue.add(j);
-			this.currentMaxPriority = j.schedulingPriority;
+			this.currentMaxPriority = j.getSchedulingPriority();
 		} else {
 			switch (strategy) {
 			case 0: /* FIFO */
 				requestsQueue.add(j);
-				currentMaxPriority = j.schedulingPriority;
+				currentMaxPriority = j.getSchedulingPriority();
 				break;
 			case 1: /* PR */
-				currentPriority = j.schedulingPriority;
+				currentPriority = j.getSchedulingPriority();
 				if (currentPriority > currentMaxPriority) {
 					requestsQueue.add(0, j);
 					currentMaxPriority = currentPriority;
 				} else if (currentPriority <= requestsQueue.get(requestsQueue
-						.size() - 1).schedulingPriority) {
+						.size() - 1).getSchedulingPriority()) {
 					requestsQueue.add(j);
 				} else {
 					for (int i = 0; i < requestsQueue.size(); i++) {
-						if (currentPriority > requestsQueue.get(i).schedulingPriority) {
+						if (currentPriority > requestsQueue.get(i).getSchedulingPriority()) {
 							requestsQueue.add(i, j);
 							break;
 						}
@@ -97,7 +97,7 @@ public class HPSSimQueue implements IQueue {
 			return null;
 		} else {
 			for (int i = 0; i < requestsQueue.size(); i++) {
-				if (requestsQueue.get(i).classification == 0) {
+				if (requestsQueue.get(i).getClassification() == 0) {
 					return requestsQueue.remove(i);
 				}
 			}
@@ -114,7 +114,7 @@ public class HPSSimQueue implements IQueue {
 			return null;
 		} else {
 			for (int i = 0; i < requestsQueue.size(); i++) {
-				if (requestsQueue.get(i).classification == 1) {
+				if (requestsQueue.get(i).getClassification() == 1) {
 					return requestsQueue.remove(i);
 				}
 			}
@@ -134,7 +134,7 @@ public class HPSSimQueue implements IQueue {
 		} else {
 			int size = 0;
 			for (int i = 0; i < requestsQueue.size(); i++) {
-				if (requestsQueue.get(i).classification == 1) {
+				if (requestsQueue.get(i).getClassification() == 1) {
 					size++;
 				}
 			}
@@ -164,7 +164,7 @@ public class HPSSimQueue implements IQueue {
 	@Override
 	public void printpriority() {
 		for (Job job : requestsQueue) {
-			System.out.print(job.getPriority());
+			System.out.print(job.getProcessPriority());
 		}
 
 	}
@@ -242,9 +242,9 @@ public class HPSSimQueue implements IQueue {
 		int oldprio = 0;
 		int newprio = 0;
 		for (Job job : requestsQueue) {
-			oldprio = job.getPp();
-			newprio = oldprio + job.getPs();
-			job.setPs(newprio);
+			oldprio = job.getProcessPriority();
+			newprio = oldprio + job.getSchedulingPriority();
+			job.setSchedulingPriority(newprio);
 			oldprio = 0;
 			newprio = 0;
 		}

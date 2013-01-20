@@ -9,7 +9,7 @@ public class PriorityComparatorJob implements Comparator<Job> {
 
 	@Override
 	public int compare(Job o1, Job o2) {
-		return (o1.schedulingPriority > o2.schedulingPriority ? 1 : (o1.schedulingPriority == o2.schedulingPriority ? 0 : -1));
+		return (o1.getSchedulingPriority() > o2.getSchedulingPriority() ? 1 : (o1.getSchedulingPriority() == o2.getSchedulingPriority() ? 0 : -1));
 }
 
 }

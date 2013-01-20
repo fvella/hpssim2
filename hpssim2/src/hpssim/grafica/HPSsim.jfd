@@ -29,7 +29,7 @@ new FormModel {
 					}
 					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class info.clearthought.layout.TableLayout ) {
 						"$columnSpecs": "1.0, 70.0, 70.0, 70.0, 68.0, 70.0, 70.0, 74.0"
-						"$rowSpecs": "0.01, 27.0, 21.0, 26.0, 27.0, 25.0, 25.0, 25.0, 21.0, 21.0, pref, pref, pref, 22.0, pref"
+						"$rowSpecs": "0.01, 27.0, 21.0, 26.0, 27.0, 25.0, 25.0, 25.0, 21.0, 21.0, pref, 12.0, pref, 22.0, 23.0"
 						"hGap": 5
 						"vGap": 5
 					} ) {
@@ -74,7 +74,7 @@ new FormModel {
 						} )
 						add( new FormComponent( "javax.swing.JTextField" ) {
 							name: "ngpu"
-							"text": "2"
+							"text": "0"
 						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
 							"gridX": 5
 							"gridY": 2
@@ -108,23 +108,16 @@ new FormModel {
 						add( new FormComponent( "javax.swing.JSlider" ) {
 							name: "sliderSimulationTime"
 							"value": 100000
-							"maximum": 190000
+							"maximum": 1200000
 							addEvent( new FormEvent( "javax.swing.event.ChangeListener", "stateChanged", "sliderSimulationTimeStateChanged", true ) )
 						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
 							"gridX": 2
 							"gridY": 5
-							"gridWidth": 4
+							"gridWidth": 5
 						} )
 						add( new FormComponent( "javax.swing.JLabel" ) {
 							name: "textFieldSimTime"
 							"text": "100000 ms"
-						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
-							"gridX": 6
-							"gridY": 5
-						} )
-						add( new FormComponent( "javax.swing.JCheckBox" ) {
-							name: "checkBoxEndJob"
-							"text": "End Job"
 						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
 							"gridX": 7
 							"gridY": 5
@@ -140,41 +133,63 @@ new FormModel {
 						} )
 						add( new FormComponent( "javax.swing.JSlider" ) {
 							name: "sliderJob"
-							"maximum": 1000
+							"maximum": 20000
 							addEvent( new FormEvent( "javax.swing.event.ChangeListener", "stateChanged", "sliderJobStateChanged", true ) )
 						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
 							"gridX": 2
 							"gridY": 6
-							"gridWidth": 3
+							"gridWidth": 5
 						} )
 						add( new FormComponent( "javax.swing.JLabel" ) {
 							name: "textFieldNjob"
 							"text": "50"
 						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
-							"gridX": 5
+							"gridX": 7
 							"gridY": 6
 						} )
 						add( new FormComponent( "javax.swing.JLabel" ) {
 							name: "label9"
 							"text": "Media arrivo"
 						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
-							"gridX": 6
-							"gridY": 6
+							"gridX": 1
+							"gridY": 7
 							"hAlign": 3
 						} )
 						add( new FormComponent( "javax.swing.JTextField" ) {
 							name: "textFieldQVGA"
 							"text": "230"
 						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
-							"gridX": 7
-							"gridY": 6
+							"gridX": 2
+							"gridY": 7
+						} )
+						add( new FormComponent( "javax.swing.JLabel" ) {
+							name: "label43"
+							"text": "Media exe"
+						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+							"gridX": 3
+							"gridY": 7
+							"hAlign": 3
+						} )
+						add( new FormComponent( "javax.swing.JTextField" ) {
+							name: "tex_mediaexe"
+							"text": "1000"
+						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+							"gridX": 4
+							"gridY": 7
+						} )
+						add( new FormComponent( "javax.swing.JCheckBox" ) {
+							name: "checkBoxEndJob"
+							"text": "End Job"
+						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+							"gridX": 6
+							"gridY": 7
 						} )
 						add( new FormComponent( "javax.swing.JLabel" ) {
 							name: "label6"
 							"text": "Scheduler"
 						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
 							"gridX": 1
-							"gridY": 8
+							"gridY": 9
 							"hAlign": 3
 						} )
 						add( new FormComponent( "javax.swing.JComboBox" ) {
@@ -187,7 +202,7 @@ new FormModel {
 							addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "comboBoxSchedulerActionPerformed", true ) )
 						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
 							"gridX": 2
-							"gridY": 8
+							"gridY": 9
 							"gridWidth": 4
 						} )
 						add( new FormComponent( "javax.swing.JLabel" ) {
@@ -195,7 +210,7 @@ new FormModel {
 							"text": "Time Slice"
 						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
 							"gridX": 6
-							"gridY": 8
+							"gridY": 9
 							"hAlign": 3
 						} )
 						add( new FormComponent( "javax.swing.JTextField" ) {
@@ -203,14 +218,14 @@ new FormModel {
 							"text": "210"
 						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
 							"gridX": 7
-							"gridY": 8
+							"gridY": 9
 						} )
 						add( new FormComponent( "javax.swing.JLabel" ) {
 							name: "label7"
 							"text": "Queue"
 						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
 							"gridX": 1
-							"gridY": 9
+							"gridY": 10
 							"hAlign": 3
 						} )
 						add( new FormComponent( "javax.swing.JComboBox" ) {
@@ -225,53 +240,14 @@ new FormModel {
 							}
 						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
 							"gridX": 2
-							"gridY": 9
+							"gridY": 10
 							"gridWidth": 4
 						} )
-						add( new FormComponent( "javax.swing.JLabel" ) {
-							name: "label12"
-							"text": "RT Job Prob"
+						add( new FormComponent( "com.jformdesigner.designer.wrapper.VSpacer" ) {
+							name: "vSpacer2"
 						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
 							"gridX": 1
-							"gridY": 11
-							"hAlign": 3
-						} )
-						add( new FormComponent( "javax.swing.JSlider" ) {
-							name: "sliderRTJob"
-							"value": 45
-							addEvent( new FormEvent( "javax.swing.event.ChangeListener", "stateChanged", "sliderRTJobStateChanged", true ) )
-						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
-							"gridX": 2
-							"gridY": 11
-						} )
-						add( new FormComponent( "javax.swing.JLabel" ) {
-							name: "labelRT"
-							"text": "45%"
-						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
-							"gridX": 3
-							"gridY": 11
-						} )
-						add( new FormComponent( "javax.swing.JLabel" ) {
-							name: "label14"
-							"text": "OpenCL Job "
-						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
-							"gridX": 5
-							"gridY": 11
-							"hAlign": 3
-						} )
-						add( new FormComponent( "javax.swing.JSlider" ) {
-							name: "sliderOpenCl"
-							"value": 35
-							addEvent( new FormEvent( "javax.swing.event.ChangeListener", "stateChanged", "sliderOpenClStateChanged", true ) )
-						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
-							"gridX": 6
-							"gridY": 11
-						} )
-						add( new FormComponent( "javax.swing.JLabel" ) {
-							name: "labelOPENCL"
-							"text": "35%"
-						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
-							"gridX": 7
+							"gridWidth": 7
 							"gridY": 11
 						} )
 						add( new FormComponent( "javax.swing.JLabel" ) {
@@ -284,7 +260,7 @@ new FormModel {
 						} )
 						add( new FormComponent( "javax.swing.JSlider" ) {
 							name: "sliderclassRate"
-							"value": 90
+							"value": 99
 							addEvent( new FormEvent( "javax.swing.event.ChangeListener", "stateChanged", "sliderclassRateStateChanged", true ) )
 						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
 							"gridX": 2
@@ -293,17 +269,66 @@ new FormModel {
 						} )
 						add( new FormComponent( "javax.swing.JLabel" ) {
 							name: "labelclassRate"
-							"text": "90%"
+							"text": "99%"
 						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
 							"gridX": 5
 							"gridY": 12
 						} )
-						add( new FormComponent( "com.jformdesigner.designer.wrapper.VSpacer" ) {
-							name: "vSpacer2"
+						add( new FormComponent( "javax.swing.JLabel" ) {
+							name: "label12"
+							"text": "RT Job Prob"
 						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
 							"gridX": 1
 							"gridY": 13
-							"gridWidth": 7
+							"hAlign": 3
+						} )
+						add( new FormComponent( "javax.swing.JSlider" ) {
+							name: "sliderRTJob"
+							"value": 45
+							addEvent( new FormEvent( "javax.swing.event.ChangeListener", "stateChanged", "sliderRTJobStateChanged", true ) )
+						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+							"gridX": 2
+							"gridY": 13
+							"gridWidth": 3
+						} )
+						add( new FormComponent( "javax.swing.JLabel" ) {
+							name: "labelRT"
+							"text": "45%"
+						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+							"gridX": 5
+							"gridY": 13
+						} )
+						add( new FormComponent( "javax.swing.JLabel" ) {
+							name: "label14"
+							"text": "OpenCL Job "
+						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+							"gridX": 1
+							"gridY": 14
+							"hAlign": 3
+						} )
+						add( new FormComponent( "javax.swing.JSlider" ) {
+							name: "sliderOpenCl"
+							"value": 20
+							addEvent( new FormEvent( "javax.swing.event.ChangeListener", "stateChanged", "sliderOpenClStateChanged", true ) )
+						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+							"gridX": 2
+							"gridY": 14
+							"gridWidth": 3
+						} )
+						add( new FormComponent( "javax.swing.JLabel" ) {
+							name: "labelOPENCL"
+							"text": "20%"
+						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+							"gridX": 5
+							"gridY": 14
+						} )
+						add( new FormComponent( "javax.swing.JCheckBox" ) {
+							name: "checkBox_enableLog"
+							"text": "log"
+							"selected": true
+						}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+							"gridX": 7
+							"gridY": 14
 						} )
 					}, new FormLayoutConstraints( null ) {
 						"title": "Configuration"
@@ -497,12 +522,239 @@ new FormModel {
 						"title": "Performance"
 					} )
 					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class org.jdesktop.layout.GroupLayout ) {
-						"$horizontalGroup": "par l {seq l {space :::p, comp graphPanel::::530:x, space :::p}}"
-						"$verticalGroup": "par l {seq l {space :::p, comp graphPanel::::400:x, space :::p}}"
+						"$horizontalGroup": "par l {seq {par l {seq l {space :p:243:p, comp label22:::p::p, space :0:246:x}, seq t {space :::p, comp graphPanel::::530:x}}, space :::p}}"
+						"$verticalGroup": "par l {seq t {space :::p, comp label22:::p::p, space u:::p, comp graphPanel::::370:x, space :::p}}"
 					} ) {
 						name: "panelGraph"
-						add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.BorderLayout ) ) {
+						add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class info.clearthought.layout.TableLayout ) {
+							"$columnSpecs": "pref, pref, pref, pref, pref, pref, pref, pref, pref, pref"
+							"$rowSpecs": "27.0, pref, pref, pref, pref, 25.0, pref, pref, pref, pref, pref, pref, pref, pref, pref, pref"
+						} ) {
 							name: "graphPanel"
+							add( new FormComponent( "javax.swing.JLabel" ) {
+								name: "label23"
+								"text": "Carico costante"
+								"font": &SwingDerivedFont0 new com.jformdesigner.model.SwingDerivedFont( null, 3, 0, false )
+							}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+								"gridWidth": 2
+								"hAlign": 1
+							} )
+							add( new FormComponent( "javax.swing.JLabel" ) {
+								name: "label38"
+								"text": "Classification Rate"
+								"font": #SwingDerivedFont0
+							}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+								"gridWidth": 2
+								"hAlign": 1
+								"gridX": 5
+							} )
+							add( new FormComponent( "javax.swing.JTextField" ) {
+								name: "text_ClassRate"
+							}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+								"gridX": 7
+							} )
+							add( new FormComponent( "javax.swing.JLabel" ) {
+								name: "label24"
+								"text": "Coda\\Media"
+							}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+								"gridY": 1
+							} )
+							add( new FormComponent( "javax.swing.JButton" ) {
+								name: "button_CostanteCodaSuMedia"
+								"text": "Esegui"
+								addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "button_CostanteCodaSuMediaActionPerformed", true ) )
+							}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+								"gridX": 2
+								"gridY": 1
+							} )
+							add( new FormComponent( "javax.swing.JLabel" ) {
+								name: "label39"
+								"text": "Coda\\Media"
+							}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+								"gridY": 1
+								"gridX": 5
+							} )
+							add( new FormComponent( "javax.swing.JButton" ) {
+								name: "button_ClassRateCodaSuMedia"
+								"text": "Esegui"
+								addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "button_ClassRateCodaSuMediaActionPerformed", true ) )
+							}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+								"gridX": 7
+								"gridY": 1
+							} )
+							add( new FormComponent( "javax.swing.JLabel" ) {
+								name: "label25"
+								"text": "Tempo Medio Arrivo"
+							}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+								"gridY": 2
+							} )
+							add( new FormComponent( "javax.swing.JButton" ) {
+								name: "button_CostanteTempoMedioArrivo"
+								"text": "Esegui"
+								addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "button_CostanteTempoMedioArrivoActionPerformed", true ) )
+							}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+								"gridX": 2
+								"gridY": 2
+								"gridHeight": 3
+							} )
+							add( new FormComponent( "com.jformdesigner.designer.wrapper.HSpacer" ) {
+								name: "hSpacer1"
+							}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+								"gridX": 3
+								"gridHeight": 16
+							} )
+							add( new FormComponent( "javax.swing.JLabel" ) {
+								name: "label40"
+								"text": "Tempo Medio Arrivo"
+							}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+								"gridY": 2
+								"gridX": 5
+							} )
+							add( new FormComponent( "javax.swing.JButton" ) {
+								name: "button_ClassRateTempoMedioArrivo"
+								"text": "Esegui"
+								addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "button_ClassRateTempoMedioArrivoActionPerformed", true ) )
+							}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+								"gridX": 7
+								"gridY": 2
+								"gridHeight": 3
+							} )
+							add( new FormComponent( "javax.swing.JLabel" ) {
+								name: "label26"
+								"text": "Troughput"
+							}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+								"gridY": 3
+							} )
+							add( new FormComponent( "javax.swing.JLabel" ) {
+								name: "label41"
+								"text": "Troughput"
+							}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+								"gridY": 3
+								"gridX": 5
+							} )
+							add( new FormComponent( "javax.swing.JLabel" ) {
+								name: "label27"
+								"text": "Carico"
+							}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+								"gridY": 4
+							} )
+							add( new FormComponent( "javax.swing.JLabel" ) {
+								name: "label42"
+								"text": "Carico"
+							}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+								"gridY": 4
+								"gridX": 5
+							} )
+							add( new FormComponent( "javax.swing.JLabel" ) {
+								name: "label28"
+								"text": "Carico Crescente"
+								"font": #SwingDerivedFont0
+							}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+								"gridY": 5
+								"gridWidth": 2
+								"hAlign": 1
+							} )
+							add( new FormComponent( "javax.swing.JLabel" ) {
+								name: "label33"
+								"text": "Carico Burst"
+								"font": #SwingDerivedFont0
+							}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+								"gridY": 5
+								"gridWidth": 2
+								"hAlign": 1
+								"gridX": 5
+							} )
+							add( new FormComponent( "javax.swing.JLabel" ) {
+								name: "label29"
+								"text": "Coda\\Media"
+							}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+								"gridY": 6
+							} )
+							add( new FormComponent( "javax.swing.JLabel" ) {
+								name: "label30"
+								"text": "Tempo Medio Arrivo"
+							}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+								"gridY": 7
+							} )
+							add( new FormComponent( "javax.swing.JLabel" ) {
+								name: "label31"
+								"text": "Troughput"
+							}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+								"gridY": 8
+							} )
+							add( new FormComponent( "javax.swing.JLabel" ) {
+								name: "label32"
+								"text": "Carico"
+							}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+								"gridY": 9
+							} )
+							add( new FormComponent( "javax.swing.JButton" ) {
+								name: "button_CrescenteCodaSuMedia"
+								"text": "Esegui"
+								addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "button_CrescenteCodaSuMediaActionPerformed", true ) )
+							}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+								"gridX": 2
+								"gridY": 6
+							} )
+							add( new FormComponent( "javax.swing.JLabel" ) {
+								name: "label34"
+								"text": "Coda\\Media"
+							}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+								"gridY": 6
+								"gridX": 5
+							} )
+							add( new FormComponent( "javax.swing.JButton" ) {
+								name: "button_BurstCodaSuMedia"
+								"text": "Esegui"
+								addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "button_BurstCodaSuMediaActionPerformed", true ) )
+							}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+								"gridX": 7
+								"gridY": 6
+							} )
+							add( new FormComponent( "javax.swing.JButton" ) {
+								name: "button_CrescenteCarico"
+								"text": "Esegui"
+								addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "button_CrescenteCaricoActionPerformed", true ) )
+							}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+								"gridX": 2
+								"gridY": 7
+								"gridHeight": 3
+							} )
+							add( new FormComponent( "javax.swing.JLabel" ) {
+								name: "label35"
+								"text": "Tempo Medio Arrivo"
+							}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+								"gridY": 7
+								"gridX": 5
+							} )
+							add( new FormComponent( "javax.swing.JButton" ) {
+								name: "button_BurstTempoMedioArrivo"
+								"text": "Esegui"
+								addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "button_BurstTempoMedioArrivoActionPerformed", true ) )
+							}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+								"gridX": 7
+								"gridY": 7
+								"gridHeight": 3
+							} )
+							add( new FormComponent( "javax.swing.JLabel" ) {
+								name: "label36"
+								"text": "Troughput"
+							}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+								"gridY": 8
+								"gridX": 5
+							} )
+							add( new FormComponent( "javax.swing.JLabel" ) {
+								name: "label37"
+								"text": "Carico"
+							}, new FormLayoutConstraints( class com.jformdesigner.runtime.TableConstraints ) {
+								"gridY": 9
+								"gridX": 5
+							} )
+						} )
+						add( new FormComponent( "javax.swing.JLabel" ) {
+							name: "label22"
+							"text": "Grafici"
+							"font": new com.jformdesigner.model.SwingDerivedFont( null, 1, 4, false )
 						} )
 					}, new FormLayoutConstraints( null ) {
 						"title": "Graph"
@@ -556,8 +808,8 @@ new FormModel {
 			"size": new java.awt.Dimension( 585, 565 )
 		} )
 		add( new FormWindow( "javax.swing.JDialog", new FormLayoutManager( class org.jdesktop.layout.GroupLayout ) {
-			"$horizontalGroup": "par l {seq l {space :::p, par l {comp label13::t::249:x, seq t {space :0:206:x, comp button2:::p::p}, comp erroreLabel::l::249:x}, space :::p}}"
-			"$verticalGroup": "par l {seq t {space :::p, comp label13:::p:25:p, space :::x, comp erroreLabel:::p:30:p, space :::p, comp button2:::p::p, space :::p}}"
+			"$horizontalGroup": "par l {seq l {space :::p, par l {comp label13::t::324:x, seq t {space :0:281:x, comp button2:::p::p}, comp erroreLabel::l::324:x}, space :::p}}"
+			"$verticalGroup": "par l {seq t {space :::p, comp label13:::p:25:p, space ::8:x, comp erroreLabel:::p:30:p, space :::p, comp button2:::p::p, space :::p}}"
 		} ) {
 			name: "dialog1"
 			"defaultCloseOperation": 2
@@ -575,7 +827,19 @@ new FormModel {
 			} )
 		}, new FormLayoutConstraints( null ) {
 			"location": new java.awt.Point( 0, 575 )
-			"size": new java.awt.Dimension( 285, 140 )
+			"size": new java.awt.Dimension( 360, 150 )
+		} )
+		add( new FormWindow( "javax.swing.JFrame", new FormLayoutManager( class org.jdesktop.layout.GroupLayout ) {
+			"$horizontalGroup": "par l {seq l {space :::p, comp panelGraficoFinestra::::519:x, space :::p}}"
+			"$verticalGroup": "par l {seq l {space :::p, comp panelGraficoFinestra::::457:x, space :::p}}"
+		} ) {
+			name: "Grafici"
+			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.BorderLayout ) ) {
+				name: "panelGraficoFinestra"
+			} )
+		}, new FormLayoutConstraints( null ) {
+			"location": new java.awt.Point( 15, 735 )
+			"size": new java.awt.Dimension( 555, 515 )
 		} )
 	}
 }

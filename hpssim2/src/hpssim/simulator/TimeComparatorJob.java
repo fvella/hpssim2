@@ -14,6 +14,6 @@ public class TimeComparatorJob implements Comparator<Job> {
 }
 	
 	public static int getTime(Job request) {
-		return request.classification == 0 ? request.getExecutionTimeCPU() : request.getExecutionTimeGPU();
+		return request.getClassification() == 0 ? request.getExecutionTimeCPU() : request.getExecutionTimeGPU();
 	}
 }

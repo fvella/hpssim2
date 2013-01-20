@@ -72,10 +72,10 @@ public class EventWorkFlow {
 		System.out.print("ENEQUEUE " + (ev.time) + " " + hw.getCPUfree() + " " + hw.getGPUfree() + " " + scheduler.size() + " ");
 		Event ev1;
 		Job j = hw.teminate(ev.job.getId());
-		j.setPs(j.getPriority() - 5);
-		j.remainingTime -= timeslice;
-		j.executionTime += timeslice;
-		j.rescheduled++;
+		j.setSchedulingPriority(j.getProcessPriority() - 5);
+		j.setExecutionTime(j.getExecutionTime() + timeslice);
+		j.setRemainingTime(j.getRemainingTime() - timeslice);
+		j.setRescheduled(j.getRescheduled() + 1);
 		ev1 = new Event(j, Event.ENQUEUE, ev.time);
 		evl.insertEvent(ev1);
 		return ev1;

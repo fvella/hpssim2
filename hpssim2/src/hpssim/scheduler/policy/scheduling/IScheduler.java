@@ -24,4 +24,6 @@ public interface IScheduler {
 	public abstract int getProcessiInCodaCPU();
 	
 	public abstract int getProcessiInCodaGPU();
+	
+	public abstract void disableLog();
 }

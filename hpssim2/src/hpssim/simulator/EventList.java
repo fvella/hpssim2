@@ -14,10 +14,10 @@ public class EventList {
     }
 
     public void insertEvent(Event e) {
-        if (list.isEmpty()) {
+        if (list.size()==0) {
             list.add(e);
         } else {
-            if (e.time >= list.get(list.size() - 1).time) {
+            if (list.get(list.size() - 1) != null && e.time >= list.get(list.size() - 1).time) {
                 list.add(e);
             } else {
                 for (int i = 0; i < list.size(); i++) {
@@ -28,6 +28,17 @@ public class EventList {
                 }
             }
         }
+    }
+    
+    public Event remove(int jobID) {
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).job !=null && list.get(i).job.id == jobID) {
+                Event e = list.get(i);
+                list.remove(i);
+                return e;
+            }
+        }
+        return null;
     }
 
     public Event search(int type) {

@@ -66,7 +66,7 @@ public class RedBlackTree implements IQueue {
 	public void printpriority() {
 		for (List<Job> jobQueue : requestsQueue.values()) {
 			for (Job job : jobQueue) {
-				System.out.print(job.getPriority());
+				System.out.print(job.getNice());
 			}
 		}
 	}

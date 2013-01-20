@@ -4,7 +4,7 @@ import hpssim.hardware.Hardware;
 
 public class Configurator {
 	
-	public Configurator(Hardware hw, int njobs, int qt, double classificationRate, double realTimeJobsProb, double percentOpenCLjob, int avgta, int simTime, Class sched, Class queue, boolean endJob) throws Exception {
+	public Configurator(Hardware hw, int njobs, int qt, double mediaEsecuzioneJob, double classificationRate, double realTimeJobsProb, double percentOpenCLjob, int avgta, int simTime, Class sched, Class queue, boolean endJob, boolean cost, boolean crescente) throws Exception {
 		
 		if(hw.numcpus()+hw.getNumGPU() == 0)
 			throw new Exception("Inserire almeno in device");
@@ -33,10 +33,22 @@ public class Configurator {
 		this.scheduler = sched;
 		this.queue = queue;
 		this.endJob = endJob;
+		this.cost = cost;
+		this.crescente = crescente;
+		this.mediaEsecuzioneJob = mediaEsecuzioneJob;
+		
+		System.out.println(toString());
 	}
 	public Hardware hw;
 	public int njobs, qt, simTime, avgta;
-	public double classificationRate, realTimeJobsProb, percentOpenCLjob;
+	public double classificationRate, realTimeJobsProb, percentOpenCLjob, mediaEsecuzioneJob;
 	public Class scheduler, queue;
 	public boolean endJob;
+	public boolean cost,crescente;
+	
+	@Override
+	public String toString() {
+		return ""+njobs+"-"+ njobs+"-"+qt+ "-"+simTime+"-"+avgta+"-"+classificationRate+"-"+realTimeJobsProb+"-"+percentOpenCLjob+"-"+mediaEsecuzioneJob;
+	}
+	
 }

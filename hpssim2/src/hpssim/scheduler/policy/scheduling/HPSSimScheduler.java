@@ -51,16 +51,16 @@ public class HPSSimScheduler implements SchedulingPolicy {
 					gpurun = false;
 					j = queue.extract();
 				}
-				if (j.rescheduled == 0) { // if first execution set start run
+				if (j.getRescheduled() == 0) { // if first execution set start run
 											// time, remaning time
-					j.setTe(timeEv);
-					j.setTq(timeEv);
+					j.setExecutionTime(timeEv);
+					j.setQueueTime(timeEv);
 
 					if (gpurun) {
 						// System.out.print(" GPU ");
-						j.setTrem(j.executionTimeGPU);
+						j.setRemainingTime(j.getExecutionTimeGPU());
 					} else {
-						j.setTrem(j.executionTimeCPU);
+						j.setRemainingTime(j.getExecutionTimeCPU());
 					}
 				}
 				if (gpurun) {
@@ -69,7 +69,7 @@ public class HPSSimScheduler implements SchedulingPolicy {
 				} else {
 					hw.assignJobtoCPU(j);
 				}
-				if ((j.remainingTime > timeslice) && (!gpurun)) {
+				if ((j.getRemainingTime() > timeslice) && (!gpurun)) {
 					// REQUEUE //SETTA LA NUOVA PRIORITA' //SETTA IL TEMPO
 					// RIMANENTE
 					// j.rescheduled++;
@@ -77,8 +77,8 @@ public class HPSSimScheduler implements SchedulingPolicy {
 					System.out.print("REQUEUE " + (timeEv + timeslice) + " " + hw.getCPUfree() + " " + hw.getGPUfree() + " " + queue.size() + " ");
 					// evl.insertEvent(ev1);
 				} else { // FINALIZE
-					evl.insertEvent(new Event(j, Event.FINALIZE, timeEv + j.remainingTime));
-					System.out.print("FINALIZE " + (timeEv + j.remainingTime) + " " + hw.getCPUfree() + " " + hw.getGPUfree() + " " + queue.size() + " ");
+					evl.insertEvent(new Event(j, Event.FINALIZE, timeEv + j.getRemainingTime()));
+					System.out.print("FINALIZE " + (timeEv + j.getRemainingTime()) + " " + hw.getCPUfree() + " " + hw.getGPUfree() + " " + queue.size() + " ");
 					// evl.insertEvent(ev1);
 				}
 			}
@@ -117,8 +117,8 @@ public class HPSSimScheduler implements SchedulingPolicy {
 		Job j;
 		Event ev1;
 		j = hw.teminate(ev.job.id);
-		j.executionTime += j.remainingTime;
-		j.remainingTime = 0;
+		j.setExecutionTime(j.getExecutionTime() + j.getRemainingTime());
+		j.setRemainingTime(0);
 		j.setTfinalize(ev.time);
 		// add job to terminated job for stats
 		result.insert(j);
@@ -144,6 +144,12 @@ public class HPSSimScheduler implements SchedulingPolicy {
 	@Override
 	public int getProcessiInCodaGPU() {
 		return queue.getLenghtQueueGPU();
+	}
+
+	@Override
+	public void disableLog() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

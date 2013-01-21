@@ -279,9 +279,9 @@ public class CompletelyFairScheduler implements SchedulingPolicy {
 			// si tratta di un evento run chiamato dallo scheduler
 
 			// GPU
-			if (getCPUfree() > 0) {
+//			if (getCPUfree() > 0) {
 				// per eseguire un processo sulla gpu
-				// c'è bisogno di almeno una gpu
+				// c'è bisogno di almeno una cpu
 				for (int i = 0; i < gpu_rq.length; i++) {
 					// scorro la lista delle gpu
 					cfs_rq = gpu_rq[i];
@@ -289,14 +289,15 @@ public class CompletelyFairScheduler implements SchedulingPolicy {
 
 					executeJob( timeEv+1, evl, true, true);
 				}
-			}
+//			}
 
 			// CPU
 			for (int i = 0; i < cpu_rq.length; i++) {
 				// scorro la lista delle cpu
-				cfs_rq = cpu_rq[i];
-
-				executeJob( timeEv+1, evl, false, true);
+				if(!cpu_rq[i].lockDevice){
+					cfs_rq = cpu_rq[i];
+					executeJob( timeEv+1, evl, false, true);
+				}
 			}
 
 			evl.insertEvent(new Event(null, Event.RUN, nextime, CompletelyFairScheduler.CFS_RUN_TYPE_SCHEDULER));
@@ -349,7 +350,10 @@ public class CompletelyFairScheduler implements SchedulingPolicy {
 	}
 
 	private void executeJob(final int timeEv, EventList evl, boolean gpu, boolean scheduler) {
-
+		
+		if(cfs_rq.lockDevice)
+			throw new RuntimeException("DEVICE LOCKED!!");
+		
 		int nextime = timeEv + (int) sysctl_sched_latency;
 		Job j = null;
 
@@ -488,10 +492,43 @@ public class CompletelyFairScheduler implements SchedulingPolicy {
 
 		se.setQueue(j);
 		updateJob(se, time, se.getClassification() != 0);
+		
+		if(se.getClassification()==1)
+			lockCPU(evl, time);
+		
+			
 		// renqueue_weight += se.getWeight();
 
 		// evl.insertEvent(new Event(se, Event.RUN, (int) (time +
 		// sysctl_sched_latency), CompletelyFairScheduler.CFS_RUN_TYPE_START));
+	}
+
+	private void lockCPU(EventList evl,final int time) {
+		//viene richiesto il lock di una cpu
+		//serve per simulare il processo host di opecl
+		//si sceglie la cpu piu scarica, viene svuotata di tutta la coda (i processi vengono smistati alle altre cpu)
+		for (int i = 0; i < cpu_rq.length; i++) {
+			if(cpu_rq[i].lockDevice)//un device è gia lock
+				return;
+		}
+		
+		loadBalancing(0, true);
+		
+		if(cfs_rq.getCurr()!=null){
+			deleteEvent(evl, cfs_rq.getCurr());
+			evl.insertEvent(new Event(cfs_rq.getCurr(), Event.ENQUEUE, time));
+		} else 
+			cpuFree--;
+		
+		Job j= cfs_rq.extract();
+		
+		 while (j!=null) {
+			deleteEvent(evl, j);
+			evl.insertEvent(new Event(j, Event.ENQUEUE, time));
+			
+			j= cfs_rq.extract();
+		 }
+		 cfs_rq.lockDevice=true;
 	}
 
 	/**
@@ -503,9 +540,13 @@ public class CompletelyFairScheduler implements SchedulingPolicy {
 		long w = 0;
 		if (classification == 0) {
 			// CPU
-			w = cpu_rq[0].renqueue_weight;
+			if(!cpu_rq[0].lockDevice)
+				w = cpu_rq[0].renqueue_weight;
+			else 
+				w = cpu_rq[1].renqueue_weight;
+			
 			for (int i = 1; i < cpu_rq.length; i++) {
-				if (w > cpu_rq[i].renqueue_weight) {
+				if (!cpu_rq[i].lockDevice && w > cpu_rq[i].renqueue_weight) {
 					w = cpu_rq[i].renqueue_weight;
 					j = i;
 				}
@@ -586,8 +627,24 @@ public class CompletelyFairScheduler implements SchedulingPolicy {
 			System.out.print("Queue | ");
 		if (logEnable)
 			printjob();
+		
+		if(ev.job.getClassification()==1){
+			//se è l'ultimo processo GPU
+			if(getProcessiInGPU()==0)
+				unLockCPU();
+		}
 	}
 	
+	private void unLockCPU() {
+		for (int i = 0; i < cpu_rq.length; i++) {
+			if(cpu_rq[i].lockDevice){
+				cpu_rq[i].lockDevice=false;
+				cpuFree++;
+				return;
+			}
+		}
+	}
+
 	@Override
 	public int size() {
 		return getProcessiInCodaCPU() + getProcessiInCodaGPU();
@@ -610,7 +667,17 @@ public class CompletelyFairScheduler implements SchedulingPolicy {
 		}
 		return size;
 	}
-
+	
+	public int getProcessiInGPU() {
+		int size = 0;
+		for (int i = 0; i < gpu_rq.length; i++) {
+			size += gpu_rq[i].size();
+			if(gpu_rq[i].getCurr()!=null)
+				size++;
+		}
+		return size;
+	}
+	
 	@Override
 	public void disableLog() {
 		logEnable = false;

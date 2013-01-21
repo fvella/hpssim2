@@ -153,7 +153,7 @@ public class Simulator extends Thread {
 				if(costant)
 					job.setExecutionTimeCPU((int) mediaEsecuzioneJob);
 				else
-					job.setExecutionTimeCPU((int) randomJob.nextExponential(mediaEsecuzioneJob));
+					job.setExecutionTimeCPU((int) randomJob.nextGaussian(mediaEsecuzioneJob, mediaEsecuzioneJob/2d));
 //				job.setRcpu((int) randomJob.nextUniform(0, time_sim / (10 * njobs)));
 				
 				if (randomJob.nextUniform(0, 1) > percentOpenCLjob) {

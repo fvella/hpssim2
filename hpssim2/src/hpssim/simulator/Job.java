@@ -20,7 +20,7 @@ public class Job /* implements Comparable<Job> */{
 	private int executionTime; /* execution time */
 	private int tfinalize; /**/
 	private int rescheduled;
-	private int type; /* O realttime 1 user */
+	private int type; /* O realttime 1 user 2 Kernel */
 	public final int id;
 
 	private Integer vruntime; /* valore per CFS */

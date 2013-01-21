@@ -17,6 +17,8 @@ public class RedBlackTree implements IQueue {
 	private TreeMap<Integer, ArrayList<Job>> requestsQueue;
 	private Job curr;
 	public long renqueue_weight = 0;
+	
+	public boolean lockDevice = false;
 
 	@Override
 	public String toString() {

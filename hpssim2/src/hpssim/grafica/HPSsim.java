@@ -274,21 +274,30 @@ public class HPSsim {
 	private void eseguiBatch(Configurator conf) throws Exception{
 		long time = System.currentTimeMillis();
 		endJobs = false;
-		for(int i =1; i<11; i++){
-			for(int j = 0; j<=i;j++){
-				while(endJobs){
-					 Thread.sleep(1000);
-				 }
-			     endJobs=true;
-				 conf.hw = new Hardware(i, j);
-				 startSimulation(conf);
-			}
-		 }
+//		for(int i =1; i<11; i++){
+//			for(int j = 0; j<=i;j++){
+//				while(endJobs){
+//					 Thread.sleep(1000);
+//				 }
+//			     endJobs=true;
+//				 conf.hw = new Hardware(i, j);
+//				 startSimulation(conf);
+//			}
+//		 }
 		
-		while(endJobs){
-			 Thread.sleep(1000);
-		 }
-		conf.hw = new Hardware(10, 256);
+//		for(int i =1; i<100; i++){
+//				while(endJobs){
+//					 Thread.sleep(1000);
+//				 }
+//			     endJobs=true;
+//				 conf.hw = new Hardware(4, i);
+//				 startSimulation(conf);
+//		 }
+//		
+//		while(endJobs){
+//			 Thread.sleep(1000);
+//		 }
+		conf.hw = new Hardware(4, 0);
 		startSimulation(conf);
 		
 		System.out.println("Esecuzione BATCH terminata "+ (System.currentTimeMillis()-time)/1000l);
@@ -559,7 +568,7 @@ public class HPSsim {
 		datasetQueue = new XYSeries("Queue size");
 		
 		try {
-			Hardware hw = new Hardware(4, 0);
+			Hardware hw = new Hardware(4, 2);
 			 Configurator conf = new Configurator(hw, //Hardware
 											/*NJOB*/			1000,    
 											/*QT*/				210, 
@@ -609,7 +618,7 @@ public class HPSsim {
 						/*NJOB*/			10000,    
 						/*QT*/				210, 
 						/*mediaEsecJob*/	1000d,
-						/*classRate*/		0.5d, 
+						/*classRate*/		1.0d, 
 						/*rtJobProb*/		0.15d, 
 						/*clPerc*/			0.60d, 
 						/*mediaArrivo*/		700, 

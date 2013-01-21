@@ -9,6 +9,9 @@ public class Configurator {
 		if(hw.numcpus()+hw.getNumGPU() == 0)
 			throw new Exception("Inserire almeno in device");
 		
+		if(hw.numgpus()>0 && hw.numcpus() == 1)
+			throw new Exception("Per i processi OpenCL sulla GPU c'è bisogno di almeno 2 CPU");
+		
 		this.hw = hw;
 		this.njobs = njobs;
 		if(njobs==0)

@@ -13,7 +13,7 @@ import hpssim.simulator.Job;
  * 
  * @author Luigi Giorgio Claudio Mancini
  */
-public class CompletelyFairScheduler implements SchedulingPolicy {
+public class CompletelyFairScheduler implements IScheduler {
 
 	private boolean logEnable = true;
 
@@ -418,9 +418,6 @@ public class CompletelyFairScheduler implements SchedulingPolicy {
 				// setta il curr a null
 				cfs_rq.setCurr(null);
 				return;
-				
-			
-
 		} else {
 			// non ha ancora finito l'esecuzione
 			// se non ci sono job nella coda con priorità maggiore
@@ -506,29 +503,59 @@ public class CompletelyFairScheduler implements SchedulingPolicy {
 	private void lockCPU(EventList evl,final int time) {
 		//viene richiesto il lock di una cpu
 		//serve per simulare il processo host di opecl
-		//si sceglie la cpu piu scarica, viene svuotata di tutta la coda (i processi vengono smistati alle altre cpu)
+		//si sceglie la cpu piu carica, viene svuotata di tutta la coda (i processi vengono smistati alle altre cpu)
 		for (int i = 0; i < cpu_rq.length; i++) {
 			if(cpu_rq[i].lockDevice)//un device è gia lock
 				return;
 		}
 		
-		loadBalancing(0, true);
+		wLoadBalancing();
+		
+		cfs_rq.lockDevice=true;
 		
 		if(cfs_rq.getCurr()!=null){
+			Job job = cfs_rq.getCurr();
 			deleteEvent(evl, cfs_rq.getCurr());
-			evl.insertEvent(new Event(cfs_rq.getCurr(), Event.ENQUEUE, time));
+//			evl.insertEvent(new Event(cfs_rq.getCurr(), Event.ENQUEUE, time));
+			
+			int j = loadBalancing(0, false);
+			cpu_rq[j].insert(job);
+			cpu_rq[j].renqueue_weight += job.getWeight();
+			job.setQueue(j);
+			
+			cfs_rq.setCurr(null);
 		} else 
 			cpuFree--;
 		
-		Job j= cfs_rq.extract();
+		Job job= cfs_rq.extract();
 		
-		 while (j!=null) {
-			deleteEvent(evl, j);
-			evl.insertEvent(new Event(j, Event.ENQUEUE, time));
+		 while (job!=null) {
+			deleteEvent(evl, job);
+//			evl.insertEvent(new Event(j, Event.ENQUEUE, time));
 			
-			j= cfs_rq.extract();
+			int j = loadBalancing(0, false);
+			cpu_rq[j].insert(job);
+			cpu_rq[j].renqueue_weight += job.getWeight();
+			job.setQueue(j);
+			
+			cfs_rq.setCurr(null);
+			job= cfs_rq.extract();
 		 }
-		 cfs_rq.lockDevice=true;
+		 cfs_rq = null;
+	}
+
+	//cerca la cpu piu carica
+	private void wLoadBalancing() {
+		int j = 0;
+		long w = 0;
+
+		for (int i = 0; i < cpu_rq.length; i++) {
+			if (w < cpu_rq[i].renqueue_weight) {
+				 w = cpu_rq[i].renqueue_weight;
+				 j = i;
+			}
+		}
+		cfs_rq = cpu_rq[j];
 	}
 
 	/**
@@ -540,12 +567,15 @@ public class CompletelyFairScheduler implements SchedulingPolicy {
 		long w = 0;
 		if (classification == 0) {
 			// CPU
-			if(!cpu_rq[0].lockDevice)
+			if(!cpu_rq[0].lockDevice){
 				w = cpu_rq[0].renqueue_weight;
-			else 
+				j=0;
+			}
+			else {
 				w = cpu_rq[1].renqueue_weight;
-			
-			for (int i = 1; i < cpu_rq.length; i++) {
+				j=1;
+			}
+			for (int i = 0; i < cpu_rq.length; i++) {
 				if (!cpu_rq[i].lockDevice && w > cpu_rq[i].renqueue_weight) {
 					w = cpu_rq[i].renqueue_weight;
 					j = i;

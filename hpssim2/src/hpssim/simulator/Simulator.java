@@ -8,6 +8,7 @@ import hpssim.scheduler.policy.queue.FIFO;
 import hpssim.scheduler.policy.queue.IQueue;
 import hpssim.scheduler.policy.scheduling.CompletelyFairScheduler;
 import hpssim.scheduler.policy.scheduling.HPSSimScheduler;
+import hpssim.scheduler.policy.scheduling.IScheduler;
 import hpssim.scheduler.policy.scheduling.SchedulingPolicy;
 
 import java.io.FileWriter;
@@ -38,7 +39,7 @@ public class Simulator extends Thread {
 	private Hardware hw;
 	private int njobs;
 	private double realTimeJobsProb, mediaEsecuzioneJob;
-	private SchedulingPolicy scheduler;
+	private IScheduler scheduler;
 	public double time_sim = 1000000d;
 	private boolean costant=false;
 	private Configurator conf;
@@ -51,21 +52,21 @@ public class Simulator extends Thread {
 	private HPSsim owner;
 	private boolean endJob;
 
-	public Simulator(Hardware _hw, int _njobs, int _quantum, double mediaEsecuzioneJob, double _classificationRate, double _realTimeJobsProb, double _hjobrate, int _avgta, double _simTime) {
-		logger.setLevel(Level.INFO);
-
-		tq = _quantum;
-		this.njobs = _njobs;
-		this.classificationRate = _classificationRate;
-		this.realTimeJobsProb = _realTimeJobsProb;
-		this.percentOpenCLjob = _hjobrate;
-		this.hw = _hw;
-		this.avgta = _avgta;
-		this.mediaEsecuzioneJob = mediaEsecuzioneJob;
-		
-		time_sim = _simTime;
-
-	}
+//	public Simulator(Hardware _hw, int _njobs, int _quantum, double mediaEsecuzioneJob, double _classificationRate, double _realTimeJobsProb, double _hjobrate, int _avgta, double _simTime) {
+//		logger.setLevel(Level.INFO);
+//
+//		tq = _quantum;
+//		this.njobs = _njobs;
+//		this.classificationRate = _classificationRate;
+//		this.realTimeJobsProb = _realTimeJobsProb;
+//		this.percentOpenCLjob = _hjobrate;
+//		this.hw = _hw;
+//		this.avgta = _avgta;
+//		this.mediaEsecuzioneJob = mediaEsecuzioneJob;
+//		
+//		time_sim = _simTime;
+//
+//	}
 	
 	public void setLogLevel(boolean l){
 		infoLog = l;
@@ -131,6 +132,11 @@ public class Simulator extends Thread {
 			/* ta,rcpu,rgpu,type */
 			
 			int interarrivo = (int) randomJob.nextExponential(this.avgta);
+			
+			while(interarrivo<0){
+				interarrivo = (int) randomJob.nextExponential(this.avgta);
+			}
+			
 			if(costant)
 				interarrivo = avgta;
 			if(conf.crescente)
@@ -156,15 +162,19 @@ public class Simulator extends Thread {
 					job.setExecutionTimeCPU((int) randomJob.nextGaussian(mediaEsecuzioneJob, mediaEsecuzioneJob/2d));
 //				job.setRcpu((int) randomJob.nextUniform(0, time_sim / (10 * njobs)));
 				
+				while(job.getExecutionTimeCPU()<0){
+					job.setExecutionTimeCPU((int) randomJob.nextGaussian(mediaEsecuzioneJob, mediaEsecuzioneJob/2d));
+				}
+				
 				if (randomJob.nextUniform(0, 1) > percentOpenCLjob) {
 					/* CPU JOB */
 					/* GPU time is long */
-					job.setExecutionTimeGPU((int) (job.getExecutionTimeCPU() * randomJob.nextUniform(1, 300)));
+					job.setExecutionTimeGPU((int) (job.getExecutionTimeCPU() * (int)randomJob.nextUniform(1, 300)));
 
 				} else {
 					/* GPU */
 					/* using avg speedup between 2 e 40x */
-					job.setExecutionTimeGPU((int) (job.getExecutionTimeCPU() / randomJob.nextUniform(2, 40)));
+					job.setExecutionTimeGPU((int) (job.getExecutionTimeCPU() / (int)randomJob.nextUniform(2, 40)));
 				}
 
 				if (randomJob.nextUniform(0, 1) > classificationRate) {

@@ -6,7 +6,7 @@ package hpssim.scheduler;
 
 import hpssim.hardware.Hardware;
 import hpssim.scheduler.policy.queue.IQueue;
-import hpssim.scheduler.policy.scheduling.SchedulingPolicy;
+import hpssim.scheduler.policy.scheduling.IScheduler;
 import hpssim.simulator.Event;
 import hpssim.simulator.EventList;
 import hpssim.simulator.Job;
@@ -46,7 +46,7 @@ public class EventWorkFlow {
 	/*
 	 * Other methods such as recalculate priority of all job
 	 */
-	public static void enqueue(SchedulingPolicy scheduler, EventList evl, Event ev, Hardware hw) {
+	public static void enqueue(IScheduler scheduler, EventList evl, Event ev, Hardware hw) {
 		scheduler.enqueue(evl, ev.job, ev.time);
 		System.out.print("RUN " + ev.time + " " + hw.getCPUfree() + " " + hw.getGPUfree() + " " + scheduler.size() + " ");
 	}
@@ -57,7 +57,7 @@ public class EventWorkFlow {
 	 * @see hpssim.scheduler.IScheduler#run(hpssim.EventList, hpssim.Event,
 	 * hpssim.DeviceList, hpssim.Queue)
 	 */
-	public static void run(SchedulingPolicy scheduler, EventList evl, Event ev, Hardware hw) throws Exception {
+	public static void run(IScheduler scheduler, EventList evl, Event ev, Hardware hw) throws Exception {
 		scheduler.execute(ev, hw, ev.time, evl);
 	}
 
@@ -67,7 +67,7 @@ public class EventWorkFlow {
 	 * @see hpssim.scheduler.IScheduler#requeue(hpssim.EventList, hpssim.Event,
 	 * hpssim.DeviceList, hpssim.Queue)
 	 */
-	public static Event requeue(SchedulingPolicy scheduler, EventList evl, Event ev, Hardware hw, int timeslice) {
+	public static Event requeue(IScheduler scheduler, EventList evl, Event ev, Hardware hw, int timeslice) {
 		// System.out.println("REQUEUE");
 		System.out.print("ENEQUEUE " + (ev.time) + " " + hw.getCPUfree() + " " + hw.getGPUfree() + " " + scheduler.size() + " ");
 		Event ev1;
@@ -87,7 +87,7 @@ public class EventWorkFlow {
 	 * @see hpssim.scheduler.IScheduler#reschedule(hpssim.EventList,
 	 * hpssim.Event, hpssim.DeviceList, hpssim.Queue)
 	 */
-	public static void reschedule(SchedulingPolicy scheduler, EventList evl, Event ev, Hardware hw) {
+	public static void reschedule(IScheduler scheduler, EventList evl, Event ev, Hardware hw) {
 		Event ev1;
 		scheduler.newpriority();
 		ev.time += 0;
@@ -102,7 +102,7 @@ public class EventWorkFlow {
 	 * @see hpssim.scheduler.IScheduler#finalize(hpssim.EventList, hpssim.Event,
 	 * hpssim.DeviceList, hpssim.Queue, hpssim.Queue)
 	 */
-	public static void finalize(SchedulingPolicy scheduler, EventList evl, Event ev, Hardware hw, IQueue result) {
+	public static void finalize(IScheduler scheduler, EventList evl, Event ev, Hardware hw, IQueue result) {
 		scheduler.finalize(evl, ev, hw, result);
 	}
 

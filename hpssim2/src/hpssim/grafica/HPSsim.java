@@ -274,7 +274,7 @@ public class HPSsim {
 	private void eseguiBatch(Configurator conf) throws Exception{
 		long time = System.currentTimeMillis();
 		endJobs = false;
-//		for(int i =1; i<11; i++){
+//		for(int i = 2; i<11; i++){
 //			for(int j = 0; j<=i;j++){
 //				while(endJobs){
 //					 Thread.sleep(1000);
@@ -285,20 +285,18 @@ public class HPSsim {
 //			}
 //		 }
 		
-//		for(int i =1; i<100; i++){
-//				while(endJobs){
-//					 Thread.sleep(1000);
-//				 }
-//			     endJobs=true;
-//				 conf.hw = new Hardware(4, i);
-//				 startSimulation(conf);
-//		 }
+		for(int i =1; i<10; i++){
+				while(endJobs){
+					 Thread.sleep(1000);
+				 }
+			     endJobs=true;
+				 conf.hw = new Hardware(4, i);
+				 startSimulation(conf);
+		 }
 //		
 //		while(endJobs){
 //			 Thread.sleep(1000);
 //		 }
-		conf.hw = new Hardware(4, 0);
-		startSimulation(conf);
 		
 		System.out.println("Esecuzione BATCH terminata "+ (System.currentTimeMillis()-time)/1000l);
 	}
@@ -568,16 +566,16 @@ public class HPSsim {
 		datasetQueue = new XYSeries("Queue size");
 		
 		try {
-			Hardware hw = new Hardware(4, 2);
+			Hardware hw = new Hardware(4, 255);
 			 Configurator conf = new Configurator(hw, //Hardware
 											/*NJOB*/			1000,    
 											/*QT*/				210, 
 											/*mediaEsecJob*/	1000d,
 											/*classRate*/		Double.parseDouble(text_ClassRate.getText()), 
-											/*rtJobProb*/		0.25d, 
-											/*clPerc*/			0.25d, 
+											/*rtJobProb*/		0.15d, 
+											/*clPerc*/			0.60d, 
 											/*mediaArrivo*/		700, 
-											/*simTime*/			362011, 
+											/*simTime*/			360000, 
 											CompletelyFairScheduler.class ,
 											RedBlackTree.class,
 											/*endJob*/			false,

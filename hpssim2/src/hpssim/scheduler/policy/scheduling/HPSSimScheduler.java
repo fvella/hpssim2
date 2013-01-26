@@ -8,7 +8,7 @@ import hpssim.simulator.EventList;
 import hpssim.simulator.Job;
 import hpssim.simulator.Simulator;
 
-public class HPSSimScheduler implements SchedulingPolicy {
+public class HPSSimScheduler implements IScheduler {
 
 	private HPSSimQueue queue;
 	private int timeslice;

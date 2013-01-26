@@ -7,9 +7,9 @@ import hpssim.simulator.Job;
 import java.io.Serializable;
 
 
-public interface IScheduler {
+public interface IScheduler extends SchedulingPolicy  {
 
-	public abstract Job extract();
+	
 
 	public abstract void printjob();
 
@@ -17,7 +17,7 @@ public interface IScheduler {
 
 	public abstract void newpriority();
 
-    public abstract	void enqueue(EventList evl, Job job, int time);
+   
 
 	public abstract int getProcessiInElaborazione(Hardware hw);
 	

@@ -1,0 +1,53 @@
+<class-diagram version="1.0.11" icons="true" automaticImage="PNG" always-add-relationships="false" 
+  generalizations="true" realizations="true" associations="true" dependencies="false" nesting-relationships="true">  
+  <interface id="1" corner="BOTTOM_RIGHT" language="java" name="hpssim.scheduler.policy.scheduling.IScheduler" 
+    project="hpssim2" file="/hpssim2/src/hpssim/scheduler/policy/scheduling/IScheduler.java" binary="false">    
+    <position height="-1" width="-1" x="438" y="-76"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </interface>  
+  <class id="2" corner="BOTTOM_RIGHT" language="java" name="hpssim.scheduler.policy.scheduling.HPSSimScheduler" 
+    project="hpssim2" file="/hpssim2/src/hpssim/scheduler/policy/scheduling/HPSSimScheduler.java" binary="false">    
+    <position height="-1" width="-1" x="169" y="195"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="false"/>    
+    </display>  
+  </class>  
+  <interface id="3" corner="BOTTOM_RIGHT" language="java" name="hpssim.scheduler.policy.scheduling.SchedulingPolicy" 
+    project="hpssim2" file="/hpssim2/src/hpssim/scheduler/policy/scheduling/SchedulingPolicy.java" binary="false">    
+    <position height="-1" width="-1" x="144" y="-76"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </interface>  
+  <class id="4" corner="BOTTOM_RIGHT" language="java" name="hpssim.scheduler.policy.scheduling.CompletelyFairScheduler" 
+    project="hpssim2" file="/hpssim2/src/hpssim/scheduler/policy/scheduling/CompletelyFairScheduler.java" binary="false">    
+    <position height="-1" width="-1" x="732" y="168"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="false"/>      
+      <operations public="true" package="true" protected="true" private="false"/>    
+    </display>  
+  </class>  
+  <realization id="5">    
+    <end type="SOURCE" refId="2"/>    
+    <end type="TARGET" refId="1"/>  
+  </realization>  
+  <generalization id="6">    
+    <end type="SOURCE" refId="1"/>    
+    <end type="TARGET" refId="3"/>  
+  </generalization>  
+  <realization id="7">    
+    <end type="SOURCE" refId="4"/>    
+    <end type="TARGET" refId="1"/>  
+  </realization>  
+  <classifier-display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+    visibility="true">    
+    <attributes public="true" package="true" protected="true" private="true"/>    
+    <operations public="true" package="true" protected="true" private="true"/>  
+  </classifier-display>  
+  <association-display labels="true" multiplicity="true"/>
+</class-diagram>

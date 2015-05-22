@@ -1,0 +1,1 @@
+Study of scheduling strategy in GPU/CPU system.
